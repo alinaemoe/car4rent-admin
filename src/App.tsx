@@ -34,6 +34,7 @@ import { UserEdit } from "./pages/users/edit";
 import { UserCreate } from "./pages/users/create";
 import { UserShow } from "./pages/users/show";
 import { CarList } from "./pages/cars/list";
+import { CarCreate } from "./pages/cars/create";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -141,7 +142,9 @@ function App() {
 
                   <Route path="/cars">
                     <Route index element={<CarList />} />
-                    {/* Create, Edit, Show добавим позже */}
+                    <Route path="create" element={<CarCreate />} />{" "}
+                    {/* 👈 Роут */}
+                    {/* <Route path="edit/:id" element={<CarEdit />} /> */}
                   </Route>
 
                   <Route
