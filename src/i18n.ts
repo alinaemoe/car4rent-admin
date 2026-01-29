@@ -87,6 +87,17 @@ i18n
               rejectReason: "Reason for rejection",
             },
           },
+          cars: {
+            fields: {
+              car: "Car",
+              price: "Price / Day",
+              status: "Status",
+              brand: "Brand",
+              model: "Model",
+              year: "Year",
+              plate: "License Plate",
+            },
+          },
         },
       },
       ru: {
@@ -162,6 +173,17 @@ i18n
               verify: "Подтвердить",
               reject: "Отклонить",
               rejectReason: "Причина отказа",
+            },
+          },
+          cars: {
+            fields: {
+              car: "Автомобиль",
+              price: "Цена / Сутки",
+              status: "Статус",
+              brand: "Марка",
+              model: "Модель",
+              year: "Год",
+              plate: "Гос. номер",
             },
           },
         },

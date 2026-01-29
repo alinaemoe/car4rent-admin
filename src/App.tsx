@@ -33,6 +33,7 @@ import { Header } from "./components/header";
 import { UserEdit } from "./pages/users/edit";
 import { UserCreate } from "./pages/users/create";
 import { UserShow } from "./pages/users/show";
+import { CarList } from "./pages/cars/list";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -75,6 +76,17 @@ function App() {
                   name: "documents",
                   list: "/documents",
                   // show, edit, create пока не нужны, мы управляем ими из UserShow
+                },
+                {
+                  name: "cars",
+                  list: "/cars",
+                  create: "/cars/create",
+                  edit: "/cars/edit/:id",
+                  show: "/cars/show/:id",
+                  meta: {
+                    label: "Cars",
+                    // icon: <DirectionsCarIcon /> // Можно добавить иконку, если импортируешь
+                  },
                 },
               ]}
               options={{
@@ -125,6 +137,11 @@ function App() {
                     <Route path="create" element={<UserCreate />} />
                     <Route path="edit/:id" element={<UserEdit />} />
                     <Route path="show/:id" element={<UserShow />} />
+                  </Route>
+
+                  <Route path="/cars">
+                    <Route index element={<CarList />} />
+                    {/* Create, Edit, Show добавим позже */}
                   </Route>
 
                   <Route
