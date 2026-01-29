@@ -57,6 +57,7 @@ i18n
               verified: "Verified",
               notVerified: "Not Verified",
             },
+
             enums: {
               roles: {
                 ADMIN: "Admin",
@@ -68,6 +69,22 @@ i18n
                 BANNED: "Banned",
                 PENDING_VERIFICATION: "Pending",
               },
+            },
+          },
+          documents: {
+            status: {
+              PENDING: "Pending",
+              VERIFIED: "Verified",
+              REJECTED: "Rejected",
+            },
+            type: {
+              PASSPORT: "Passport",
+              DRIVER_LICENSE: "Driver's License",
+            },
+            actions: {
+              verify: "Verify",
+              reject: "Reject",
+              rejectReason: "Reason for rejection",
             },
           },
         },
@@ -117,6 +134,7 @@ i18n
               verified: "Вериф.",
               notVerified: "Не вериф.",
             },
+
             enums: {
               roles: {
                 ADMIN: "Админ",
@@ -128,6 +146,22 @@ i18n
                 BANNED: "Забанен",
                 PENDING_VERIFICATION: "На проверке",
               },
+            },
+          },
+          documents: {
+            status: {
+              PENDING: "На проверке",
+              VERIFIED: "Подтвержден",
+              REJECTED: "Отклонен",
+            },
+            type: {
+              PASSPORT: "Паспорт",
+              DRIVER_LICENSE: "Водительские права",
+            },
+            actions: {
+              verify: "Подтвердить",
+              reject: "Отклонить",
+              rejectReason: "Причина отказа",
             },
           },
         },

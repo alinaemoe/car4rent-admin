@@ -65,6 +65,17 @@ function App() {
                   show: "/users/show/:id",
                   meta: { canDelete: false },
                 },
+                {
+                  name: "rentals",
+                  list: "/rentals",
+                  show: "/rentals/show/:id",
+                  // edit, create пока не обязательно, если мы только смотрим
+                },
+                {
+                  name: "documents",
+                  list: "/documents",
+                  // show, edit, create пока не нужны, мы управляем ими из UserShow
+                },
               ]}
               options={{
                 syncWithLocation: true,
