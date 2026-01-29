@@ -10,6 +10,9 @@ import { useGetIdentity } from "@refinedev/core";
 import { HamburgerMenu, RefineThemedLayoutHeaderProps } from "@refinedev/mui";
 import React, { useContext } from "react";
 import { ColorModeContext } from "../../contexts/color-mode";
+// 👇 Для смены языка
+import { useTranslation } from "react-i18next";
+import { MenuItem, Select, FormControl } from "@mui/material";
 
 type IUser = {
   id: number;
@@ -21,8 +24,10 @@ export const Header: React.FC<RefineThemedLayoutHeaderProps> = ({
   sticky = true,
 }) => {
   const { mode, setMode } = useContext(ColorModeContext);
-
   const { data: user } = useGetIdentity<IUser>();
+
+  // 👇 Хук для смены языка
+  const { i18n } = useTranslation();
 
   return (
     <AppBar position={sticky ? "sticky" : "relative"}>
@@ -34,14 +39,30 @@ export const Header: React.FC<RefineThemedLayoutHeaderProps> = ({
           alignItems="center"
         >
           <HamburgerMenu />
+
           <Stack
             direction="row"
             width="100%"
             justifyContent="flex-end"
             alignItems="center"
+            gap={2}
           >
+            {/* 👇 ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА */}
+            <FormControl size="small" variant="standard">
+              <Select
+                disableUnderline
+                value={i18n.language}
+                onChange={(e) => i18n.changeLanguage(e.target.value)}
+                sx={{ color: "inherit", fontSize: "0.875rem" }}
+              >
+                <MenuItem value="en">🇺🇸 EN</MenuItem>
+                <MenuItem value="ru">🇷🇺 RU</MenuItem>
+              </Select>
+            </FormControl>
+
             <IconButton
               color="inherit"
+              // 👇 Вернул как было у тебя (работает в новой версии)
               onClick={() => {
                 setMode();
               }}
@@ -58,12 +79,7 @@ export const Header: React.FC<RefineThemedLayoutHeaderProps> = ({
               >
                 {user?.name && (
                   <Typography
-                    sx={{
-                      display: {
-                        xs: "none",
-                        sm: "inline-block",
-                      },
-                    }}
+                    sx={{ display: { xs: "none", sm: "inline-block" } }}
                     variant="subtitle2"
                   >
                     {user?.name}

@@ -1,57 +1,71 @@
 import { Authenticated, Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+import { useTranslation } from "react-i18next";
+import "./i18n";
+import { TOptions } from "i18next";
 
-// 👇 БЕРЕМ ГОТОВЫЕ КОМПОНЕНТЫ UI (включая AuthPage)
 import {
   ErrorComponent,
   useNotificationProvider,
   RefineSnackbarProvider,
   ThemedLayout,
-  ThemedTitle, // Если будет ругаться, попробуй просто ThemedTitle
-  AuthPage, // 👈 Вот она, готовая страница входа!
+  // ThemedHeader нам больше не нужен из библиотеки, у нас свой!
+  ThemedTitle,
+  AuthPage,
 } from "@refinedev/mui";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
-
-// 👇 РОУТИНГ
 import routerBindings, {
   CatchAllNavigate,
   DocumentTitleHandler,
   NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
-
-// 👇 DATA PROVIDER (который мы только что установили)
 import dataProvider from "@refinedev/simple-rest";
-
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
-
-// 👇 НАШИ ФАЙЛЫ
 import { authProvider } from "./authProvider";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import { axiosInstance, API_URL } from "./utility/axios-instance";
 
+import { UserList } from "./pages/users/list";
+import { Header } from "./components/header";
+import { UserEdit } from "./pages/users/edit";
+import { UserCreate } from "./pages/users/create";
+import { UserShow } from "./pages/users/show";
+
 function App() {
+  const { t, i18n } = useTranslation();
+
+  const i18nProvider = {
+    translate: (key: string, params?: TOptions) => t(key, params),
+    changeLocale: (lang: string) => i18n.changeLanguage(lang),
+    getLocale: () => i18n.language,
+  };
+
   return (
     <BrowserRouter>
       <ColorModeContextProvider>
         <CssBaseline />
         <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
         <RefineKbarProvider>
-          {/* Оборачиваем в SnackbarProvider для уведомлений */}
           <RefineSnackbarProvider>
             <Refine
-              // 👇 Подключаем Data Provider с нашим axios (чтобы летели токены)
               dataProvider={dataProvider(API_URL, axiosInstance)}
               notificationProvider={useNotificationProvider}
               routerProvider={routerBindings}
+              i18nProvider={i18nProvider}
               authProvider={authProvider}
-              resources={
-                [
-                  // Пока пусто, добавим ресурсы позже
-                ]
-              }
+              resources={[
+                {
+                  name: "users",
+                  list: "/users",
+                  create: "/users/create",
+                  edit: "/users/edit/:id",
+                  show: "/users/show/:id",
+                  meta: { canDelete: false },
+                },
+              ]}
               options={{
                 syncWithLocation: true,
                 warnWhenUnsavedChanges: true,
@@ -59,7 +73,6 @@ function App() {
               }}
             >
               <Routes>
-                {/* 1. СТРАНИЦА ВХОДА (Используем готовую AuthPage) */}
                 <Route
                   element={
                     <Authenticated
@@ -71,18 +84,18 @@ function App() {
                     </Authenticated>
                   }
                 >
-                  {/* type="login" рисует форму входа */}
                   <Route path="/login" element={<AuthPage type="login" />} />
                 </Route>
 
-                {/* 2. АДМИНКА (Внутрянка) */}
                 <Route
                   element={
                     <Authenticated
                       key="authenticated-inner"
                       fallback={<CatchAllNavigate to="/login" />}
                     >
+                      {/* 👇 ВСТАВЛЯЕМ СВОЙ ХЕДЕР СЮДА */}
                       <ThemedLayout
+                        Header={Header}
                         Title={({ collapsed }) => (
                           <ThemedTitle
                             collapsed={collapsed}
@@ -96,10 +109,16 @@ function App() {
                     </Authenticated>
                   }
                 >
-                  {/* Пока нет ресурсов, перекидываем на заглушку или 404 */}
+                  <Route path="/users">
+                    <Route index element={<UserList />} />
+                    <Route path="create" element={<UserCreate />} />
+                    <Route path="edit/:id" element={<UserEdit />} />
+                    <Route path="show/:id" element={<UserShow />} />
+                  </Route>
+
                   <Route
                     index
-                    element={<div>Welcome to the admin panel!</div>}
+                    element={<NavigateToResource resource="users" />}
                   />
                   <Route path="*" element={<ErrorComponent />} />
                 </Route>
