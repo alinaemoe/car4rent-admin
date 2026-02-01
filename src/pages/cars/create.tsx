@@ -15,13 +15,19 @@ import {
   ListItem,
   ListItemText,
   IconButton,
+  Stack, // 👈 ВАЖНО
 } from "@mui/material";
 import { useForm } from "@refinedev/react-hook-form";
+import { FormProvider } from "react-hook-form";
 import { useTranslate, useNavigation, useNotification } from "@refinedev/core";
 import { Controller } from "react-hook-form";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { axiosInstance } from "../../utility/axios-instance";
+
+import { FormLanguageProvider } from "../../contexts/form-language";
+import { LanguageTabs } from "../../components/form/language-tabs";
+import { LocalizedInput } from "../../components/form/localized-input";
 
 // ... ENUMS (TRANSMISSION_OPTIONS, FUEL_OPTIONS) оставляем как были ...
 const TRANSMISSION_OPTIONS = [
@@ -46,13 +52,7 @@ export const CarCreate = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  const {
-    saveButtonProps,
-    register,
-    control,
-    formState: { errors },
-  } = useForm({
-    // 1. Настройки React Hook Form
+  const methods = useForm({
     defaultValues: {
       brand: "",
       model: "",
@@ -65,8 +65,9 @@ export const CarCreate = () => {
       transmission: "AUTOMATIC",
       fuel_type: "PETROL",
       status: "AVAILABLE",
-      color: { ru: "", en: "" },
-      description: { ru: "", en: "" },
+      // 👇 Тут теперь пустые объекты, они заполнятся динамически
+      color: {},
+      description: {},
     },
     // 2. 👇 Настройки Refine (ТУТ ЖИВУТ МУТАЦИИ)
     refineCoreProps: {
@@ -109,6 +110,13 @@ export const CarCreate = () => {
     },
   }) as any; // as any оставляем для спокойствия
 
+  const {
+    saveButtonProps,
+    register,
+    control,
+    formState: { errors },
+  } = methods;
+
   // Обработчик выбора файлов
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -120,248 +128,253 @@ export const CarCreate = () => {
   const removeFile = (index: number) => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
+  console.log("Validation Errors:", methods.formState.errors);
 
   return (
-    <Create
-      saveButtonProps={{ ...saveButtonProps, disabled: isUploading }}
-      isLoading={isUploading}
-    >
-      <Box
-        component="form"
-        autoComplete="off"
-        sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+    <FormProvider {...methods}>
+      <Create
+        saveButtonProps={{ ...saveButtonProps, disabled: isUploading }}
+        isLoading={isUploading}
       >
-        <Typography variant="h6">Basic Info</Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              {...register("brand", { required: t("errors.required.field") })}
-              error={!!errors.brand}
-              helperText={errors.brand?.message}
-              fullWidth
-              label={t("cars.fields.brand", "Brand")}
-              placeholder="BMW"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              {...register("model", { required: t("errors.required.field") })}
-              error={!!errors.model}
-              helperText={errors.model?.message}
-              fullWidth
-              label={t("cars.fields.model", "Model")}
-              placeholder="X5"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={6} sm={4}>
-            <TextField
-              {...register("year", {
-                required: t("errors.required.field"),
-                min: { value: 1900, message: "Invalid year" },
-              })}
-              type="number"
-              fullWidth
-              label={t("cars.fields.year", "Year")}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={6} sm={4}>
-            <FormControl fullWidth>
-              <InputLabel>
-                {t("cars.fields.transmission", "Transmission")}
-              </InputLabel>
-              <Controller
-                name="transmission"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    label={t("cars.fields.transmission", "Transmission")}
-                  >
-                    {TRANSMISSION_OPTIONS.map((opt) => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControl fullWidth>
-              <InputLabel>{t("cars.fields.fuel", "Fuel")}</InputLabel>
-              <Controller
-                name="fuel_type"
-                control={control}
-                render={({ field }) => (
-                  <Select {...field} label={t("cars.fields.fuel", "Fuel")}>
-                    {FUEL_OPTIONS.map((opt) => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-            </FormControl>
-          </Grid>
-        </Grid>
-
-        <Typography variant="h6">Identification & Pricing</Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              {...register("license_plate", { required: true })}
-              fullWidth
-              label={t("cars.fields.plate", "License Plate")}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              {...register("vin", { required: true })}
-              fullWidth
-              label="VIN"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              {...register("price_per_day", {
-                required: true,
-                valueAsNumber: true,
-              })}
-              fullWidth
-              type="number"
-              label={t("cars.fields.price", "Price / Day")}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">$</InputAdornment>
-                ),
-              }}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={6} sm={4}>
-            <TextField
-              {...register("mileage_limit_per_day", { valueAsNumber: true })}
-              fullWidth
-              type="number"
-              label="Limit (km/day)"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={6} sm={4}>
-            <TextField
-              {...register("price_per_km_over_limit", { valueAsNumber: true })}
-              fullWidth
-              type="number"
-              label="Over limit ($/km)"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-        </Grid>
-
-        <Typography variant="h6">Localization (Color & Desc)</Typography>
-        <Grid container spacing={2}>
-          {/* ЦВЕТА */}
-          <Grid item xs={6}>
-            <TextField
-              {...register("color.en", { required: true })}
-              fullWidth
-              label="Color (EN)"
-              placeholder="Black"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              {...register("color.ru", { required: true })}
-              fullWidth
-              label="Цвет (RU)"
-              placeholder="Черный"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-
-          {/* ОПИСАНИЕ */}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              {...register("description.en")}
-              fullWidth
-              multiline
-              rows={3}
-              label="Description (EN)"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              {...register("description.ru")}
-              fullWidth
-              multiline
-              rows={3}
-              label="Описание (RU)"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-        </Grid>
-
-        {/* --- ЗАГРУЗКА КАРТИНОК --- */}
         <Box
-          sx={{
-            p: 2,
-            border: "1px dashed grey",
-            borderRadius: 2,
-            textAlign: "center",
-          }}
+          component="form"
+          autoComplete="off"
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
         >
-          <Typography variant="h6" gutterBottom>
-            Images
-          </Typography>
-
-          <Button
-            component="label"
-            variant="contained"
-            startIcon={<CloudUploadIcon />}
-          >
-            Select Files
-            <input
-              type="file"
-              hidden
-              multiple // 👈 Разрешаем несколько файлов
-              accept="image/*"
-              onChange={handleFileChange}
-            />
-          </Button>
-
-          <List dense sx={{ mt: 2, maxWidth: 400, mx: "auto" }}>
-            {selectedFiles.map((file, index) => (
-              <ListItem
-                key={index}
-                secondaryAction={
-                  <IconButton edge="end" onClick={() => removeFile(index)}>
-                    <DeleteIcon />
-                  </IconButton>
-                }
-              >
-                <ListItemText
-                  primary={file.name}
-                  secondary={`${(file.size / 1024).toFixed(0)} KB`}
+          <Typography variant="h6">Basic Info</Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                {...register("brand", { required: t("errors.required.field") })}
+                error={!!errors.brand}
+                helperText={errors.brand?.message}
+                fullWidth
+                label={t("cars.fields.brand", "Brand")}
+                placeholder="BMW"
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                {...register("model", { required: t("errors.required.field") })}
+                error={!!errors.model}
+                helperText={errors.model?.message}
+                fullWidth
+                label={t("cars.fields.model", "Model")}
+                placeholder="X5"
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={6} sm={4}>
+              <TextField
+                {...register("year", {
+                  required: t("errors.required.field"),
+                  valueAsNumber: true,
+                  min: { value: 1900, message: "Invalid year" },
+                })}
+                type="number"
+                fullWidth
+                label={t("cars.fields.year", "Year")}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={6} sm={4}>
+              <FormControl fullWidth>
+                <InputLabel>
+                  {t("cars.fields.transmission", "Transmission")}
+                </InputLabel>
+                <Controller
+                  name="transmission"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      label={t("cars.fields.transmission", "Transmission")}
+                    >
+                      {TRANSMISSION_OPTIONS.map((opt) => (
+                        <MenuItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
                 />
-              </ListItem>
-            ))}
-          </List>
-          {selectedFiles.length === 0 && (
-            <Typography variant="body2" color="text.secondary" mt={1}>
-              No files selected
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <InputLabel>{t("cars.fields.fuel", "Fuel")}</InputLabel>
+                <Controller
+                  name="fuel_type"
+                  control={control}
+                  render={({ field }) => (
+                    <Select {...field} label={t("cars.fields.fuel", "Fuel")}>
+                      {FUEL_OPTIONS.map((opt) => (
+                        <MenuItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
+
+          <Typography variant="h6">Identification & Pricing</Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                {...register("license_plate", { required: true })}
+                fullWidth
+                label={t("cars.fields.plate", "License Plate")}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                {...register("vin", { required: true })}
+                fullWidth
+                label="VIN"
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                {...register("price_per_day", {
+                  required: true,
+                  valueAsNumber: true,
+                })}
+                fullWidth
+                type="number"
+                label={t("cars.fields.price", "Price / Day")}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">$</InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={6} sm={4}>
+              <TextField
+                {...register("mileage_limit_per_day", { valueAsNumber: true })}
+                fullWidth
+                type="number"
+                label="Limit (km/day)"
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={6} sm={4}>
+              <TextField
+                {...register("price_per_km_over_limit", {
+                  valueAsNumber: true,
+                })}
+                fullWidth
+                type="number"
+                label="Over limit ($/km)"
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+          </Grid>
+
+          <FormLanguageProvider>
+            <Box
+              sx={{
+                p: 2,
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+              }}
+            >
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={2}
+              >
+                <Typography variant="h6">Localization</Typography>
+
+                {/* 👇 ОДНА ПАНЕЛЬ ТАБОВ НА ВСЮ СЕКЦИЮ */}
+                <LanguageTabs />
+              </Stack>
+
+              <Grid container spacing={2}>
+                {/* ЦВЕТ: Сам подстроится под табы */}
+                <Grid item xs={12} md={6}>
+                  <LocalizedInput
+                    baseName="color"
+                    label={t("cars.fields.color", "Color")}
+                    required
+                  />
+                </Grid>
+
+                {/* ОПИСАНИЕ: Сама подстроится под табы */}
+                <Grid item xs={12} md={6}>
+                  <LocalizedInput
+                    baseName="description"
+                    label={t("cars.fields.description", "Description")}
+                    multiline
+                    rows={4}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          </FormLanguageProvider>
+
+          {/* --- ЗАГРУЗКА КАРТИНОК --- */}
+          <Box
+            sx={{
+              p: 2,
+              border: "1px dashed grey",
+              borderRadius: 2,
+              textAlign: "center",
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Images
             </Typography>
-          )}
+
+            <Button
+              component="label"
+              variant="contained"
+              startIcon={<CloudUploadIcon />}
+            >
+              Select Files
+              <input
+                type="file"
+                hidden
+                multiple // 👈 Разрешаем несколько файлов
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </Button>
+
+            <List dense sx={{ mt: 2, maxWidth: 400, mx: "auto" }}>
+              {selectedFiles.map((file, index) => (
+                <ListItem
+                  key={index}
+                  secondaryAction={
+                    <IconButton edge="end" onClick={() => removeFile(index)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  }
+                >
+                  <ListItemText
+                    primary={file.name}
+                    secondary={`${(file.size / 1024).toFixed(0)} KB`}
+                  />
+                </ListItem>
+              ))}
+            </List>
+            {selectedFiles.length === 0 && (
+              <Typography variant="body2" color="text.secondary" mt={1}>
+                No files selected
+              </Typography>
+            )}
+          </Box>
         </Box>
-      </Box>
-    </Create>
+      </Create>
+    </FormProvider>
   );
 };

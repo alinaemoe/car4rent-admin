@@ -106,7 +106,6 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
   };
 
   const documents = result?.data || [];
-  console.log(result);
 
   if (isLoading)
     return (

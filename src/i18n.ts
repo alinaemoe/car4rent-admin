@@ -19,6 +19,15 @@ i18n
               field: "This field is required",
             },
           },
+          buttons: {
+            addNewPhotos: "Add New Photos",
+          },
+          notifications: {
+            imagesUploaded: "New images uploaded",
+            imageDeleted: "Image deleted",
+            errorUploading: "Error uploading images",
+            errorDeleting: "Error deleting image",
+          },
           users: {
             titles: {
               list: "Users",
@@ -88,6 +97,13 @@ i18n
             },
           },
           cars: {
+            sections: {
+              basicInfo: "Basic Info",
+              pricing: "Identification & Pricing",
+              configuration: "Configuration & Relations",
+              localization: "Localization",
+              images: "Images",
+            },
             fields: {
               car: "Car",
               price: "Price / Day",
@@ -96,6 +112,44 @@ i18n
               model: "Model",
               year: "Year",
               plate: "License Plate",
+              transmission: "Transmission",
+              fuel: "Fuel",
+              mileageLimit: "Limit (km/day)",
+              overLimitPrice: "Over limit ($/km)",
+              color: "Color",
+              description: "Description",
+              owner: {
+                label: "Owner",
+                placeholder: "Select User",
+                helperText: "Who owns this car?",
+                company: "Company (Our Fleet)",
+              },
+              location: {
+                label: "Location",
+                placeholder: "Select Location",
+              },
+              features: {
+                label: "Features",
+                placeholder: "Select Features",
+              },
+            },
+            enums: {
+              transmission: {
+                AUTOMATIC: "Automatic",
+                MANUAL: "Manual",
+                ROBOT: "Robot",
+              },
+              fuel: {
+                PETROL: "Petrol",
+                DIESEL: "Diesel",
+                ELECTRIC: "Electric",
+                HYBRID: "Hybrid",
+              },
+              status: {
+                AVAILABLE: "Available",
+                RENTED: "Rented",
+                MAINTENANCE: "Maintenance",
+              },
             },
           },
         },
@@ -106,6 +160,15 @@ i18n
             required: {
               field: "Поле обязательно для заполнения",
             },
+          },
+          buttons: {
+            addNewPhotos: "Добавить фото",
+          },
+          notifications: {
+            imagesUploaded: "Новые изображения загружены",
+            imageDeleted: "Изображение удалено",
+            errorUploading: "Ошибка при загрузке",
+            errorDeleting: "Ошибка при удалении",
           },
           users: {
             titles: {
@@ -176,6 +239,13 @@ i18n
             },
           },
           cars: {
+            sections: {
+              basicInfo: "Основная информация",
+              pricing: "Идентификация и цена",
+              configuration: "Конфигурация и связи",
+              localization: "Локализация",
+              images: "Изображения",
+            },
             fields: {
               car: "Автомобиль",
               price: "Цена / Сутки",
@@ -184,6 +254,44 @@ i18n
               model: "Модель",
               year: "Год",
               plate: "Гос. номер",
+              transmission: "Трансмиссия",
+              fuel: "Топливо",
+              mileageLimit: "Лимит (км/день)",
+              overLimitPrice: "Доплата за перелимит ($/км)",
+              color: "Цвет",
+              description: "Описание",
+              owner: {
+                label: "Владелец",
+                placeholder: "Выберите пользователя",
+                helperText: "Кому принадлежит этот автомобиль?",
+                company: "Компания (Наш парк)",
+              },
+              location: {
+                label: "Локация",
+                placeholder: "Выберите локацию",
+              },
+              features: {
+                label: "Опции",
+                placeholder: "Выберите опции",
+              },
+            },
+            enums: {
+              transmission: {
+                AUTOMATIC: "Автомат",
+                MANUAL: "Механика",
+                ROBOT: "Робот",
+              },
+              fuel: {
+                PETROL: "Бензин",
+                DIESEL: "Дизель",
+                ELECTRIC: "Электро",
+                HYBRID: "Гибрид",
+              },
+              status: {
+                AVAILABLE: "Доступен",
+                RENTED: "В аренде",
+                MAINTENANCE: "Обслуживание",
+              },
             },
           },
         },

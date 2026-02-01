@@ -27,6 +27,7 @@ import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import { authProvider } from "./authProvider";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import { axiosInstance, API_URL } from "./utility/axios-instance";
+import { AppSettingsProvider } from "./contexts/app-settings";
 
 import { UserList } from "./pages/users/list";
 import { Header } from "./components/header";
@@ -35,6 +36,7 @@ import { UserCreate } from "./pages/users/create";
 import { UserShow } from "./pages/users/show";
 import { CarList } from "./pages/cars/list";
 import { CarCreate } from "./pages/cars/create";
+import { CarEdit } from "./pages/cars/edit";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -47,121 +49,124 @@ function App() {
 
   return (
     <BrowserRouter>
-      <ColorModeContextProvider>
-        <CssBaseline />
-        <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
-        <RefineKbarProvider>
-          <RefineSnackbarProvider>
-            <Refine
-              dataProvider={dataProvider(API_URL, axiosInstance)}
-              notificationProvider={useNotificationProvider}
-              routerProvider={routerBindings}
-              i18nProvider={i18nProvider}
-              authProvider={authProvider}
-              resources={[
-                {
-                  name: "users",
-                  list: "/users",
-                  create: "/users/create",
-                  edit: "/users/edit/:id",
-                  show: "/users/show/:id",
-                  meta: { canDelete: false },
-                },
-                {
-                  name: "rentals",
-                  list: "/rentals",
-                  show: "/rentals/show/:id",
-                  // edit, create пока не обязательно, если мы только смотрим
-                },
-                {
-                  name: "documents",
-                  list: "/documents",
-                  // show, edit, create пока не нужны, мы управляем ими из UserShow
-                },
-                {
-                  name: "cars",
-                  list: "/cars",
-                  create: "/cars/create",
-                  edit: "/cars/edit/:id",
-                  show: "/cars/show/:id",
-                  meta: {
-                    label: "Cars",
-                    // icon: <DirectionsCarIcon /> // Можно добавить иконку, если импортируешь
+      <AppSettingsProvider>
+        <ColorModeContextProvider>
+          <CssBaseline />
+          <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
+          <RefineKbarProvider>
+            <RefineSnackbarProvider>
+              <Refine
+                dataProvider={dataProvider(API_URL, axiosInstance)}
+                notificationProvider={useNotificationProvider}
+                routerProvider={routerBindings}
+                i18nProvider={i18nProvider}
+                authProvider={authProvider}
+                resources={[
+                  {
+                    name: "users",
+                    list: "/users",
+                    create: "/users/create",
+                    edit: "/users/edit/:id",
+                    show: "/users/show/:id",
+                    meta: { canDelete: false },
                   },
-                },
-              ]}
-              options={{
-                syncWithLocation: true,
-                warnWhenUnsavedChanges: true,
-                projectId: "car4rent-admin",
-              }}
-            >
-              <Routes>
-                <Route
-                  element={
-                    <Authenticated
-                      key="authenticated-outer"
-                      fallback={<Outlet />}
-                      loading={<div>Loading...</div>}
-                    >
-                      <NavigateToResource />
-                    </Authenticated>
-                  }
-                >
-                  <Route path="/login" element={<AuthPage type="login" />} />
-                </Route>
-
-                <Route
-                  element={
-                    <Authenticated
-                      key="authenticated-inner"
-                      fallback={<CatchAllNavigate to="/login" />}
-                    >
-                      {/* 👇 ВСТАВЛЯЕМ СВОЙ ХЕДЕР СЮДА */}
-                      <ThemedLayout
-                        Header={Header}
-                        Title={({ collapsed }) => (
-                          <ThemedTitle
-                            collapsed={collapsed}
-                            text="Car4Rent"
-                            icon={collapsed ? "C" : "Car4Rent"}
-                          />
-                        )}
+                  {
+                    name: "rentals",
+                    list: "/rentals",
+                    show: "/rentals/show/:id",
+                    // edit, create пока не обязательно, если мы только смотрим
+                  },
+                  {
+                    name: "documents",
+                    list: "/documents",
+                    // show, edit, create пока не нужны, мы управляем ими из UserShow
+                  },
+                  {
+                    name: "cars",
+                    list: "/cars",
+                    create: "/cars/create",
+                    edit: "/cars/edit/:id",
+                    show: "/cars/show/:id",
+                    meta: {
+                      label: "Cars",
+                      // icon: <DirectionsCarIcon /> // Можно добавить иконку, если импортируешь
+                    },
+                  },
+                  { name: "locations" }, // Нужно для Location
+                  { name: "features" },
+                ]}
+                options={{
+                  syncWithLocation: true,
+                  warnWhenUnsavedChanges: true,
+                  projectId: "car4rent-admin",
+                }}
+              >
+                <Routes>
+                  <Route
+                    element={
+                      <Authenticated
+                        key="authenticated-outer"
+                        fallback={<Outlet />}
+                        loading={<div>Loading...</div>}
                       >
-                        <Outlet />
-                      </ThemedLayout>
-                    </Authenticated>
-                  }
-                >
-                  <Route path="/users">
-                    <Route index element={<UserList />} />
-                    <Route path="create" element={<UserCreate />} />
-                    <Route path="edit/:id" element={<UserEdit />} />
-                    <Route path="show/:id" element={<UserShow />} />
-                  </Route>
-
-                  <Route path="/cars">
-                    <Route index element={<CarList />} />
-                    <Route path="create" element={<CarCreate />} />{" "}
-                    {/* 👈 Роут */}
-                    {/* <Route path="edit/:id" element={<CarEdit />} /> */}
+                        <NavigateToResource />
+                      </Authenticated>
+                    }
+                  >
+                    <Route path="/login" element={<AuthPage type="login" />} />
                   </Route>
 
                   <Route
-                    index
-                    element={<NavigateToResource resource="users" />}
-                  />
-                  <Route path="*" element={<ErrorComponent />} />
-                </Route>
-              </Routes>
+                    element={
+                      <Authenticated
+                        key="authenticated-inner"
+                        fallback={<CatchAllNavigate to="/login" />}
+                      >
+                        {/* 👇 ВСТАВЛЯЕМ СВОЙ ХЕДЕР СЮДА */}
+                        <ThemedLayout
+                          Header={Header}
+                          Title={({ collapsed }) => (
+                            <ThemedTitle
+                              collapsed={collapsed}
+                              text="Car4Rent"
+                              icon={collapsed ? "C" : "Car4Rent"}
+                            />
+                          )}
+                        >
+                          <Outlet />
+                        </ThemedLayout>
+                      </Authenticated>
+                    }
+                  >
+                    <Route path="/users">
+                      <Route index element={<UserList />} />
+                      <Route path="create" element={<UserCreate />} />
+                      <Route path="edit/:id" element={<UserEdit />} />
+                      <Route path="show/:id" element={<UserShow />} />
+                    </Route>
 
-              <RefineKbar />
-              <UnsavedChangesNotifier />
-              <DocumentTitleHandler />
-            </Refine>
-          </RefineSnackbarProvider>
-        </RefineKbarProvider>
-      </ColorModeContextProvider>
+                    <Route path="/cars">
+                      <Route index element={<CarList />} />
+                      <Route path="create" element={<CarCreate />} />
+                      <Route path="edit/:id" element={<CarEdit />} />
+                    </Route>
+
+                    <Route
+                      index
+                      element={<NavigateToResource resource="users" />}
+                    />
+                    <Route path="*" element={<ErrorComponent />} />
+                  </Route>
+                </Routes>
+
+                <RefineKbar />
+                <UnsavedChangesNotifier />
+                <DocumentTitleHandler />
+              </Refine>
+            </RefineSnackbarProvider>
+          </RefineKbarProvider>
+        </ColorModeContextProvider>
+      </AppSettingsProvider>
     </BrowserRouter>
   );
 }
