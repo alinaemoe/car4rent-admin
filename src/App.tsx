@@ -37,6 +37,9 @@ import { UserShow } from "./pages/users/show";
 import { CarList } from "./pages/cars/list";
 import { CarCreate } from "./pages/cars/create";
 import { CarEdit } from "./pages/cars/edit";
+import { CarShow } from "./pages/cars/show";
+import { RentalList } from "./pages/rentals/list";
+import { RentalCreate } from "./pages/rentals/create";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -74,7 +77,7 @@ function App() {
                     name: "rentals",
                     list: "/rentals",
                     show: "/rentals/show/:id",
-                    // edit, create пока не обязательно, если мы только смотрим
+                    create: "/rentals/create",
                   },
                   {
                     name: "documents",
@@ -94,6 +97,9 @@ function App() {
                   },
                   { name: "locations" }, // Нужно для Location
                   { name: "features" },
+                  {
+                    name: "car-damages",
+                  },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -149,6 +155,14 @@ function App() {
                       <Route index element={<CarList />} />
                       <Route path="create" element={<CarCreate />} />
                       <Route path="edit/:id" element={<CarEdit />} />
+                      <Route path="show/:id" element={<CarShow />} />
+                    </Route>
+
+                    <Route path="/rentals">
+                      <Route index element={<RentalList />} />
+                      <Route path="create" element={<RentalCreate />} />
+                      {/* <Route path="edit/:id" element={<RentalEdit />} />
+                       <Route path="show/:id" element={<RentalShow />} />  */}
                     </Route>
 
                     <Route

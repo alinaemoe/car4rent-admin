@@ -152,6 +152,27 @@ i18n
               },
             },
           },
+          rentals: {
+            fields: {
+              car: "Car",
+              user: "Driver",
+              status: "Status",
+              startDate: "Start Date",
+              endDate: "End Date",
+              price: "Price",
+            },
+            enums: {
+              status: {
+                CREATED: "Created",
+                APPROVED: "Approved",
+                ACTIVE: "Active",
+                COMPLETED: "Completed",
+                CANCELED: "Canceled",
+                REJECTED: "Rejected",
+                OVERDUE: "Overdue",
+              },
+            },
+          },
         },
       },
       ru: {
@@ -291,6 +312,27 @@ i18n
                 AVAILABLE: "Доступен",
                 RENTED: "В аренде",
                 MAINTENANCE: "Обслуживание",
+              },
+            },
+          },
+          rentals: {
+            fields: {
+              car: "Автомобиль",
+              user: "Водитель",
+              status: "Статус",
+              startDate: "Начало",
+              endDate: "Конец",
+              price: "Стоимость",
+            },
+            enums: {
+              status: {
+                CREATED: "Создано",
+                APPROVED: "Одобрено",
+                ACTIVE: "В пути",
+                COMPLETED: "Завершено",
+                CANCELED: "Отменено",
+                REJECTED: "Отклонено",
+                OVERDUE: "Просрочено",
               },
             },
           },

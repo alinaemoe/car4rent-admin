@@ -44,7 +44,7 @@ export const RentalsTab = ({ userId }: RentalsTabProps) => {
     },
   }) as any;
 
-  const rows = result?.data?.data || [];
+  const rows = result?.data || [];
 
   const columns = useMemo<GridColDef[]>(() => {
     const baseColumns: GridColDef[] = [
