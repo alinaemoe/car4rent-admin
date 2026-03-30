@@ -29,17 +29,18 @@ export const AppSettingsProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        // Запрашиваем языки с бэкенда
         const { data } = await axiosInstance.get("/languages");
-        // Фильтруем только активные (если бэк отдает все)
-        const activeLangs = Array.isArray(data)
-          ? data.filter((l: any) => l.is_active)
+
+        // 👇 Умная распаковка: если бэк обернул в { data: [...] }, достаем оттуда
+        const rawList = Array.isArray(data) ? data : data?.data;
+
+        const activeLangs = Array.isArray(rawList)
+          ? rawList.filter((l: any) => l.is_active)
           : [];
 
         setLanguages(activeLangs);
       } catch (error) {
         console.error("Failed to load languages:", error);
-        // Фоллбэк, чтобы админка не умерла, если бэк лежит
         setLanguages([{ code: "en", name: "English", is_active: true }]);
       } finally {
         setIsLoading(false);
