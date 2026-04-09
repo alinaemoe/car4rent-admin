@@ -13,6 +13,7 @@ import {
   ThemedTitle,
   AuthPage,
 } from "@refinedev/mui";
+import TranslateIcon from "@mui/icons-material/Translate";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
@@ -40,6 +41,9 @@ import { CarEdit } from "./pages/cars/edit";
 import { CarShow } from "./pages/cars/show";
 import { RentalList } from "./pages/rentals/list";
 import { RentalCreate } from "./pages/rentals/create";
+import { TranslationList } from "./pages/translations/list";
+import { TranslationCreate } from "./pages/translations/create";
+import { TranslationEdit } from "./pages/translations/edit";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -93,6 +97,16 @@ function App() {
                     meta: {
                       label: "Cars",
                       // icon: <DirectionsCarIcon /> // Можно добавить иконку, если импортируешь
+                    },
+                  },
+                  {
+                    name: "translations",
+                    list: "/translations",
+                    create: "/translations/create",
+                    edit: "/translations/edit/:id",
+                    meta: {
+                      canDelete: true,
+                      icon: <TranslateIcon />,
                     },
                   },
                   { name: "locations" }, // Нужно для Location
@@ -163,6 +177,12 @@ function App() {
                       <Route path="create" element={<RentalCreate />} />
                       {/* <Route path="edit/:id" element={<RentalEdit />} />
                        <Route path="show/:id" element={<RentalShow />} />  */}
+                    </Route>
+
+                    <Route path="/translations">
+                      <Route index element={<TranslationList />} />
+                      <Route path="create" element={<TranslationCreate />} />
+                      <Route path="edit/:id" element={<TranslationEdit />} />
                     </Route>
 
                     <Route
