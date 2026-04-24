@@ -20,7 +20,8 @@ interface UserRow {
   email: string;
   roles: string[];
   status: string;
-  is_verified: boolean;
+  is_email_verified: boolean; // 👈
+  is_documents_verified: boolean; // 👈
   created_at: string;
 }
 
@@ -156,8 +157,26 @@ export const UserList = () => {
       },
 
       {
-        field: "is_verified",
-        headerName: t("users.fields.verified"),
+        field: "is_email_verified",
+        headerName: t("users.fields.emailVerified", "Email Ver."),
+        minWidth: 100,
+        type: "boolean",
+        align: "center",
+        headerAlign: "center",
+        renderCell: ({ value }) => (
+          <CenteredCell>
+            {value ? (
+              <CheckCircleIcon color="success" fontSize="small" />
+            ) : (
+              <CancelIcon color="disabled" fontSize="small" />
+            )}
+          </CenteredCell>
+        ),
+      },
+
+      {
+        field: "is_documents_verified",
+        headerName: t("users.fields.documentsVerified", "Docs Ver."),
         minWidth: 100,
         type: "boolean",
         align: "center",

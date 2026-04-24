@@ -30,7 +30,8 @@ export const UserCreate = () => {
     defaultValues: {
       status: "ACTIVE",
       roles: ["CLIENT"],
-      is_verified: false,
+      is_email_verified: false, // 👈
+      is_documents_verified: false, // 👈
       first_name: "",
       last_name: "",
       email: "",
@@ -170,12 +171,30 @@ export const UserCreate = () => {
         </FormControl>
 
         {/* ===== VERIFIED ===== */}
+        {/* ===== EMAIL VERIFIED ===== */}
         <Controller
-          name="is_verified"
+          name="is_email_verified"
           control={control}
           render={({ field }) => (
             <FormControlLabel
-              label={t("users.fields.verified")}
+              label={t("users.fields.emailVerified", "Email Verified")}
+              control={
+                <Checkbox
+                  checked={!!field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                />
+              }
+            />
+          )}
+        />
+
+        {/* ===== DOCUMENTS VERIFIED ===== */}
+        <Controller
+          name="is_documents_verified"
+          control={control}
+          render={({ field }) => (
+            <FormControlLabel
+              label={t("users.fields.documentsVerified", "Docs Verified")}
               control={
                 <Checkbox
                   checked={!!field.value}

@@ -78,25 +78,54 @@ export const DetailsTab = ({ record, t }: { record: any; t: any }) => {
               </Typography>
             </Stack>
             <Divider />
+
+            {/* EMAIL VERIFIED */}
             <Stack
               direction="row"
               justifyContent="space-between"
               alignItems="center"
             >
               <Typography color="text.secondary">
-                {t("users.fields.verified")}
+                {t("users.fields.emailVerified", "Email Verified")}
               </Typography>
-              {record?.is_verified ? (
+              {record?.is_email_verified ? (
                 <Chip
                   icon={<CheckCircleIcon />}
-                  label="Verified"
+                  label="Yes"
                   color="success"
                   size="small"
                 />
               ) : (
                 <Chip
                   icon={<CancelIcon />}
-                  label="Not Verified"
+                  label="No"
+                  color="error"
+                  size="small"
+                />
+              )}
+            </Stack>
+            <Divider />
+
+            {/* DOCUMENTS VERIFIED */}
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography color="text.secondary">
+                {t("users.fields.documentsVerified", "Docs Verified")}
+              </Typography>
+              {record?.is_documents_verified ? (
+                <Chip
+                  icon={<CheckCircleIcon />}
+                  label="Yes"
+                  color="success"
+                  size="small"
+                />
+              ) : (
+                <Chip
+                  icon={<CancelIcon />}
+                  label="No"
                   color="error"
                   size="small"
                 />
