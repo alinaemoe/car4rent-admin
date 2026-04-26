@@ -14,6 +14,7 @@ import {
   AuthPage,
 } from "@refinedev/mui";
 import TranslateIcon from "@mui/icons-material/Translate";
+import HandshakeIcon from "@mui/icons-material/Handshake";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
@@ -44,6 +45,8 @@ import { RentalCreate } from "./pages/rentals/create";
 import { TranslationList } from "./pages/translations/list";
 import { TranslationCreate } from "./pages/translations/create";
 import { TranslationEdit } from "./pages/translations/edit";
+import { PartnershipRequestList } from "./pages/partnership-requests/list";
+import { PartnershipRequestShow } from "./pages/partnership-requests/show";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -97,6 +100,15 @@ function App() {
                     meta: {
                       label: "Cars",
                       // icon: <DirectionsCarIcon /> // Можно добавить иконку, если импортируешь
+                    },
+                  },
+                  {
+                    name: "partnership-requests",
+                    list: "/partnership-requests",
+                    show: "/partnership-requests/show/:id",
+                    meta: {
+                      label: "Partner Requests",
+                      icon: <HandshakeIcon />,
                     },
                   },
                   {
@@ -170,6 +182,14 @@ function App() {
                       <Route path="create" element={<CarCreate />} />
                       <Route path="edit/:id" element={<CarEdit />} />
                       <Route path="show/:id" element={<CarShow />} />
+                    </Route>
+
+                    <Route path="/partnership-requests">
+                      <Route index element={<PartnershipRequestList />} />
+                      <Route
+                        path="show/:id"
+                        element={<PartnershipRequestShow />}
+                      />
                     </Route>
 
                     <Route path="/rentals">

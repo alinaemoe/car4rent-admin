@@ -1,123 +1,203 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Create } from "@refinedev/mui";
-import {
-  Box,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Typography,
-  Button,
-  Grid,
-  InputAdornment,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
-  Stack, // 👈 ВАЖНО
-} from "@mui/material";
+import { Box, CircularProgress, Alert } from "@mui/material";
 import { useForm } from "@refinedev/react-hook-form";
-import { FormProvider } from "react-hook-form";
+import { FormProvider, FieldValues } from "react-hook-form";
 import { useTranslate, useNavigation, useNotification } from "@refinedev/core";
-import { Controller } from "react-hook-form";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { useSearchParams } from "react-router-dom";
+
 import { axiosInstance } from "../../utility/axios-instance";
 
-import { FormLanguageProvider } from "../../contexts/form-language";
-import { LanguageTabs } from "../../components/form/language-tabs";
-import { LocalizedInput } from "../../components/form/localized-input";
+// Импорт карточек-компонентов
+import { BasicInfoCard } from "./components/BasicInfoCard";
+import { TechSpecsCard } from "./components/TechSpecsCard";
+import { PricingCard } from "./components/PricingCard";
+import { ImagesCard } from "./components/ImagesCard";
+import { DescriptionCard } from "./components/DescriptionCard";
 
-// ... ENUMS (TRANSMISSION_OPTIONS, FUEL_OPTIONS) оставляем как были ...
-const TRANSMISSION_OPTIONS = [
-  { value: "AUTOMATIC", label: "Automatic" },
-  { value: "MANUAL", label: "Manual" },
-  { value: "ROBOT", label: "Robot" },
-];
+// Типизация словарей
+interface DictItem {
+  id: string;
+  label: string;
+  hex?: string;
+}
 
-const FUEL_OPTIONS = [
-  { value: "PETROL", label: "Petrol" },
-  { value: "DIESEL", label: "Diesel" },
-  { value: "ELECTRIC", label: "Electric" },
-  { value: "HYBRID", label: "Hybrid" },
-];
+interface Dictionaries {
+  colors: DictItem[];
+  transmissions: DictItem[];
+  fuels: DictItem[];
+  bodies: DictItem[]; // 👈
+  drives: DictItem[]; // 👈
+}
 
-export const CarCreate = () => {
+export const CarCreate: React.FC = () => {
   const t = useTranslate();
   const { list } = useNavigation();
   const { open } = useNotification();
+  const [searchParams] = useSearchParams();
 
-  // Состояние для файлов
+  // 1. Инициализация параметров из URL (переход из заявки)
+  const reqBrand = searchParams.get("brand") || "";
+  const reqModel = searchParams.get("model") || "";
+  const parsedYear = Number(searchParams.get("year"));
+  const reqYear =
+    !isNaN(parsedYear) && parsedYear > 1900
+      ? parsedYear
+      : new Date().getFullYear();
+  const reqOwnerId = searchParams.get("owner_id") || null;
+
+  const reqPhotosParam = searchParams.get("photos");
+  const reqPhotos = reqPhotosParam ? reqPhotosParam.split(",") : [];
+
+  // 2. Стейты
+  const [existingPhotos, setExistingPhotos] = useState<string[]>(reqPhotos);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
 
-  const methods = useForm({
+  const [dicts, setDicts] = useState<Dictionaries>({
+    colors: [],
+    transmissions: [],
+    fuels: [],
+    bodies: [], // 👈
+    drives: [], // 👈
+  });
+  const [isLoadingDicts, setIsLoadingDicts] = useState<boolean>(true);
+
+  // 3. Загрузка словарей из API
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axiosInstance.get("/settings");
+
+        // Безопасный парсинг JSON
+        const parseKV = (key: string): DictItem[] => {
+          const setting = data.find(
+            (s: { key: string; value: string }) => s.key === key,
+          );
+          if (!setting) return [];
+          try {
+            return JSON.parse(setting.value);
+          } catch (e) {
+            console.error(`Error parsing setting ${key}:`, e);
+            return [];
+          }
+        };
+
+        setDicts({
+          colors: parseKV("DICT_COLORS"),
+          transmissions: parseKV("DICT_TRANSMISSIONS"),
+          fuels: parseKV("DICT_FUEL_TYPES"),
+          bodies: parseKV("DICT_BODY_TYPES"), // 👈
+          drives: parseKV("DICT_DRIVE_TYPES"), // 👈
+        });
+      } catch (error) {
+        console.error("Failed to fetch settings:", error);
+        open?.({
+          type: "error",
+          message: t(
+            "cars.messages.dicts_failed",
+            "Failed to load settings dictionaries",
+          ),
+        });
+      } finally {
+        setIsLoadingDicts(false);
+      }
+    };
+    fetchSettings();
+  }, [open, t]);
+
+  // 4. Инициализация формы
+  const methods = useForm<FieldValues, any, FieldValues>({
     defaultValues: {
-      brand: "",
-      model: "",
-      year: new Date().getFullYear(),
+      brand: reqBrand,
+      model: reqModel,
+      year: reqYear,
+      owner: reqOwnerId ? { id: reqOwnerId } : null,
       license_plate: "",
       vin: "",
+      color: "",
+      transmission: "",
+      fuel_type: "",
       price_per_day: 0,
-      mileage_limit_per_day: 300,
-      price_per_km_over_limit: 5,
-      transmission: "AUTOMATIC",
-      fuel_type: "PETROL",
+      deposit_amount: 0,
+      mileage_limit_per_day: 250,
+      price_per_km_over_limit: 15,
+      current_mileage: 0,
+      min_age: 21,
+      min_experience: 2,
+      insurance_type: "КАСКО",
       status: "AVAILABLE",
-      // 👇 Тут теперь пустые объекты, они заполнятся динамически
-      color: {},
       description: {},
+      body_type: "",
+      drive_type: "",
     },
-    // 2. 👇 Настройки Refine (ТУТ ЖИВУТ МУТАЦИИ)
     refineCoreProps: {
-      redirect: false, // Отключаем авто-редирект
-      onMutationSuccess: async (data: any) => {
-        const newCarId = data.data.id;
+      redirect: false, // Отключаем стандартный редирект, так как нам нужно догрузить фото
+      onMutationSuccess: async (response) => {
+        // Ожидаем, что бэкенд возвращает созданный объект машины
+        const newCarId = response?.data?.id;
 
-        // Если есть файлы, грузим их
-        if (selectedFiles.length > 0) {
+        if (newCarId && selectedFiles.length > 0) {
           setIsUploading(true);
           try {
+            // Загрузка файлов по одному
             for (const file of selectedFiles) {
               const formData = new FormData();
               formData.append("file", file);
-
               await axiosInstance.post(`/cars/${newCarId}/images`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
               });
             }
-
             open?.({
               type: "success",
-              message: "Images uploaded successfully",
+              message: t(
+                "cars.messages.images_uploaded",
+                "Images uploaded successfully",
+              ),
             });
           } catch (error) {
-            console.error(error);
+            console.error("Image upload error:", error);
             open?.({
               type: "error",
-              message: "Car created, but image upload failed",
-              description: "Check console for details",
+              message: t(
+                "cars.messages.images_failed",
+                "Car created, but image upload failed",
+              ),
             });
           } finally {
             setIsUploading(false);
           }
         }
 
-        // Редирект на список только после загрузки
+        // После успешного создания и загрузки фото возвращаемся к списку
         list("cars");
       },
     },
-  }) as any; // as any оставляем для спокойствия
+  });
 
-  const {
-    saveButtonProps,
-    register,
-    control,
-    formState: { errors },
-  } = methods;
+  const { saveButtonProps, handleSubmit, refineCore } = methods;
 
-  // Обработчик выбора файлов
+  // 5. Перехватчик отправки формы
+  const onFinishHandler = async (data: FieldValues) => {
+    const payload: Record<string, any> = { ...data };
+
+    // Форматируем данные владельца
+    if (data.owner?.id) {
+      payload.owner = { id: data.owner.id };
+    } else {
+      payload.owner = null; // Если выбрана "Компания"
+    }
+
+    // Прикрепляем уже загруженные фото из заявки
+    if (existingPhotos.length > 0) {
+      payload.existing_images = existingPhotos;
+    }
+
+    // Отправляем модифицированные данные в Refine
+    await refineCore.onFinish(payload);
+  };
+
+  // 6. Хендлеры для файлов
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const newFiles = Array.from(event.target.files);
@@ -125,254 +205,78 @@ export const CarCreate = () => {
     }
   };
 
-  const removeFile = (index: number) => {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  const removeFile = (indexToRemove: number) => {
+    setSelectedFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
-  console.log("Validation Errors:", methods.formState.errors);
+
+  const removeExistingPhoto = (indexToRemove: number) => {
+    setExistingPhotos((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  // Экран загрузки словарей
+  if (isLoadingDicts) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="50vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <FormProvider {...methods}>
       <Create
-        saveButtonProps={{ ...saveButtonProps, disabled: isUploading }}
+        // Правильное переопределение кнопки сохранения
+        saveButtonProps={{
+          ...saveButtonProps,
+          disabled: isUploading || saveButtonProps.disabled,
+          onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            e.preventDefault(); // Предотвращаем стандартное поведение
+            handleSubmit(onFinishHandler)(); // Вызываем RHF handleSubmit с нашим кастомным методом
+          },
+        }}
         isLoading={isUploading}
       >
         <Box
           component="form"
           autoComplete="off"
-          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+          sx={{ display: "flex", flexDirection: "column", gap: 4 }}
         >
-          <Typography variant="h6">Basic Info</Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                {...register("brand", { required: t("errors.required.field") })}
-                error={!!errors.brand}
-                helperText={errors.brand?.message}
-                fullWidth
-                label={t("cars.fields.brand", "Brand")}
-                placeholder="BMW"
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                {...register("model", { required: t("errors.required.field") })}
-                error={!!errors.model}
-                helperText={errors.model?.message}
-                fullWidth
-                label={t("cars.fields.model", "Model")}
-                placeholder="X5"
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={6} sm={4}>
-              <TextField
-                {...register("year", {
-                  required: t("errors.required.field"),
-                  valueAsNumber: true,
-                  min: { value: 1900, message: "Invalid year" },
-                })}
-                type="number"
-                fullWidth
-                label={t("cars.fields.year", "Year")}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={6} sm={4}>
-              <FormControl fullWidth>
-                <InputLabel>
-                  {t("cars.fields.transmission", "Transmission")}
-                </InputLabel>
-                <Controller
-                  name="transmission"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      label={t("cars.fields.transmission", "Transmission")}
-                    >
-                      {TRANSMISSION_OPTIONS.map((opt) => (
-                        <MenuItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  )}
-                />
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <FormControl fullWidth>
-                <InputLabel>{t("cars.fields.fuel", "Fuel")}</InputLabel>
-                <Controller
-                  name="fuel_type"
-                  control={control}
-                  render={({ field }) => (
-                    <Select {...field} label={t("cars.fields.fuel", "Fuel")}>
-                      {FUEL_OPTIONS.map((opt) => (
-                        <MenuItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  )}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
+          {/* Информационный алерт, если машина создается из заявки */}
+          {reqOwnerId && (
+            <Alert severity="info" sx={{ borderRadius: 2 }}>
+              {t(
+                "cars.messages.from_request",
+                "Автомобиль создается на основе заявки партнера. Владелец уже привязан.",
+              )}
+            </Alert>
+          )}
 
-          <Typography variant="h6">Identification & Pricing</Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                {...register("license_plate", { required: true })}
-                fullWidth
-                label={t("cars.fields.plate", "License Plate")}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                {...register("vin", { required: true })}
-                fullWidth
-                label="VIN"
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                {...register("price_per_day", {
-                  required: true,
-                  valueAsNumber: true,
-                })}
-                fullWidth
-                type="number"
-                label={t("cars.fields.price", "Price / Day")}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">$</InputAdornment>
-                  ),
-                }}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={6} sm={4}>
-              <TextField
-                {...register("mileage_limit_per_day", { valueAsNumber: true })}
-                fullWidth
-                type="number"
-                label="Limit (km/day)"
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={6} sm={4}>
-              <TextField
-                {...register("price_per_km_over_limit", {
-                  valueAsNumber: true,
-                })}
-                fullWidth
-                type="number"
-                label="Over limit ($/km)"
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-          </Grid>
+          {/* Карточки разделены по смысловым блокам */}
+          <BasicInfoCard colorsDict={dicts.colors} reqOwnerId={reqOwnerId} />
 
-          <FormLanguageProvider>
-            <Box
-              sx={{
-                p: 2,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 2,
-              }}
-            >
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={2}
-              >
-                <Typography variant="h6">Localization</Typography>
+          <TechSpecsCard
+            transmissionsDict={dicts.transmissions}
+            fuelsDict={dicts.fuels}
+            bodiesDict={dicts.bodies} // 👈
+            drivesDict={dicts.drives} // 👈
+          />
 
-                {/* 👇 ОДНА ПАНЕЛЬ ТАБОВ НА ВСЮ СЕКЦИЮ */}
-                <LanguageTabs />
-              </Stack>
+          <PricingCard />
 
-              <Grid container spacing={2}>
-                {/* ЦВЕТ: Сам подстроится под табы */}
-                <Grid item xs={12} md={6}>
-                  <LocalizedInput
-                    baseName="color"
-                    label={t("cars.fields.color", "Color")}
-                    required
-                  />
-                </Grid>
+          <DescriptionCard />
 
-                {/* ОПИСАНИЕ: Сама подстроится под табы */}
-                <Grid item xs={12} md={6}>
-                  <LocalizedInput
-                    baseName="description"
-                    label={t("cars.fields.description", "Description")}
-                    multiline
-                    rows={4}
-                  />
-                </Grid>
-              </Grid>
-            </Box>
-          </FormLanguageProvider>
-
-          {/* --- ЗАГРУЗКА КАРТИНОК --- */}
-          <Box
-            sx={{
-              p: 2,
-              border: "1px dashed grey",
-              borderRadius: 2,
-              textAlign: "center",
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              Images
-            </Typography>
-
-            <Button
-              component="label"
-              variant="contained"
-              startIcon={<CloudUploadIcon />}
-            >
-              Select Files
-              <input
-                type="file"
-                hidden
-                multiple // 👈 Разрешаем несколько файлов
-                accept="image/*"
-                onChange={handleFileChange}
-              />
-            </Button>
-
-            <List dense sx={{ mt: 2, maxWidth: 400, mx: "auto" }}>
-              {selectedFiles.map((file, index) => (
-                <ListItem
-                  key={index}
-                  secondaryAction={
-                    <IconButton edge="end" onClick={() => removeFile(index)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  }
-                >
-                  <ListItemText
-                    primary={file.name}
-                    secondary={`${(file.size / 1024).toFixed(0)} KB`}
-                  />
-                </ListItem>
-              ))}
-            </List>
-            {selectedFiles.length === 0 && (
-              <Typography variant="body2" color="text.secondary" mt={1}>
-                No files selected
-              </Typography>
-            )}
-          </Box>
+          <ImagesCard
+            selectedFiles={selectedFiles}
+            existingPhotos={existingPhotos}
+            handleFileChange={handleFileChange}
+            removeFile={removeFile}
+            removeExistingPhoto={removeExistingPhoto}
+          />
         </Box>
       </Create>
     </FormProvider>
