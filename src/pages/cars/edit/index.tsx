@@ -1,15 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Edit, useAutocomplete } from "@refinedev/mui";
 import { useForm } from "@refinedev/react-hook-form";
-import { FormProvider } from "react-hook-form";
-
+import { FormProvider, FieldValues } from "react-hook-form";
 import {
-  //useTranslate,
   useNavigation,
   useNotification,
   useInvalidate,
+  useTranslate,
 } from "@refinedev/core";
-import { Box, Tabs, Tab } from "@mui/material";
+import { Box, Tabs, Tab, CircularProgress } from "@mui/material";
 import CarCrashIcon from "@mui/icons-material/CarCrash";
 import EditIcon from "@mui/icons-material/Edit";
 
@@ -19,12 +18,27 @@ import {
   a11yProps,
 } from "../../../components/common/custom-tab-panel";
 
-// Импортируем части
+// Импортируем табы
 import { CarDetailsTab } from "./details-tab";
 import { CarDamagesTab } from "./damages-tab";
 
-export const CarEdit = () => {
-  //const t = useTranslate();
+// Типизация словарей
+export interface DictItem {
+  id: string;
+  label: string;
+  hex?: string;
+}
+
+export interface Dictionaries {
+  colors: DictItem[];
+  transmissions: DictItem[];
+  fuels: DictItem[];
+  bodies: DictItem[];
+  drives: DictItem[];
+}
+
+export const CarEdit: React.FC = () => {
+  const t = useTranslate();
   const { list } = useNavigation();
   const { open } = useNotification();
   const invalidate = useInvalidate();
@@ -33,7 +47,57 @@ export const CarEdit = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  // --- HOOKS DATA (Owner, Loc, Features) ---
+  // Стейты словарей
+  const [dicts, setDicts] = useState<Dictionaries>({
+    colors: [],
+    transmissions: [],
+    fuels: [],
+    bodies: [],
+    drives: [],
+  });
+  const [isLoadingDicts, setIsLoadingDicts] = useState(true);
+
+  // Загрузка словарей из API
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axiosInstance.get("/settings");
+        const parseKV = (key: string): DictItem[] => {
+          const setting = data.find(
+            (s: { key: string; value: string }) => s.key === key,
+          );
+          if (!setting) return [];
+          try {
+            return JSON.parse(setting.value);
+          } catch {
+            return [];
+          }
+        };
+
+        setDicts({
+          colors: parseKV("DICT_COLORS"),
+          transmissions: parseKV("DICT_TRANSMISSIONS"),
+          fuels: parseKV("DICT_FUEL_TYPES"),
+          bodies: parseKV("DICT_BODY_TYPES"),
+          drives: parseKV("DICT_DRIVE_TYPES"),
+        });
+      } catch (error) {
+        console.error("Failed to fetch settings:", error);
+        open?.({
+          type: "error",
+          message: t(
+            "cars.messages.dicts_failed",
+            "Failed to load dictionaries",
+          ),
+        });
+      } finally {
+        setIsLoadingDicts(false);
+      }
+    };
+    fetchSettings();
+  }, [open, t]);
+
+  // Данные для селектов
   const { autocompleteProps: ownerAutocompleteProps } = useAutocomplete({
     resource: "users",
   });
@@ -44,14 +108,14 @@ export const CarEdit = () => {
     resource: "features",
   });
 
-  // --- FORM ---
-  const methods = useForm({
+  // Настройка формы
+  const methods = useForm<FieldValues, any, FieldValues>({
     refineCoreProps: {
       redirect: false,
-      onMutationSuccess: async (data: any) => {
-        const carId = data.data.id;
-        if (selectedFiles.length > 0) {
-          // ... логика загрузки файлов (та же самая) ...
+      onMutationSuccess: async (response) => {
+        const carId = response?.data?.id;
+
+        if (carId && selectedFiles.length > 0) {
           setIsUploading(true);
           try {
             for (const file of selectedFiles) {
@@ -61,52 +125,72 @@ export const CarEdit = () => {
                 headers: { "Content-Type": "multipart/form-data" },
               });
             }
-            open?.({ type: "success", message: "Images uploaded" });
+            open?.({
+              type: "success",
+              message: t("cars.messages.images_uploaded", "Images uploaded"),
+            });
+            setSelectedFiles([]); // Очищаем после успешной загрузки
           } catch (e) {
-            console.error(e);
+            console.error("Image upload error:", e);
+            open?.({
+              type: "error",
+              message: t("cars.messages.images_failed", "Image upload failed"),
+            });
           } finally {
             setIsUploading(false);
           }
         }
-        // После сохранения деталей можем остаться тут или уйти
-        list("cars");
+
+        // Инвалидируем кэш, чтобы подтянулись новые фотки
         invalidate({ resource: "cars", invalidates: ["detail"], id: carId });
+        list("cars");
       },
     },
-  }) as any;
+  });
 
   const {
     saveButtonProps,
     refineCore: { query },
+    handleSubmit,
+    refineCore,
   } = methods;
+
   const carData = query?.data?.data;
 
-  // --- HANDLERS ---
-  const handleTabChange = (_: any, newValue: number) => setActiveTab(newValue);
+  // Перехватчик сохранения (чистим объекты перед отправкой патча)
+  const onFinishHandler = async (data: FieldValues) => {
+    const payload: Record<string, any> = { ...data };
 
-  const handleFileChange = (e: any) => {
-    if (e.target.files)
-      setSelectedFiles((prev) => [
-        ...prev,
-        ...Array.from(e.target.files as FileList),
-      ]);
+    if (data.owner?.id) payload.owner = { id: data.owner.id };
+    else payload.owner = null;
+
+    if (data.location?.id) payload.location = { id: data.location.id };
+    else payload.location = null;
+
+    await refineCore.onFinish(payload);
   };
-  const removeFile = (i: number) =>
-    setSelectedFiles((prev) => prev.filter((_, idx) => idx !== i));
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) =>
+    setActiveTab(newValue);
+
+  // Хендлеры файлов
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setSelectedFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, idx) => idx !== index));
+  };
 
   const handleDeleteExistingImage = async (imageId: number) => {
     try {
-      // 1. Вызываем DELETE через твой axiosInstance
-      // Он сам подставит BaseURL и Auth Token
       await axiosInstance.delete(`/cars/images/${imageId}`);
-
-      // 2. Показываем успех
       open?.({
         type: "success",
-        message: "Image deleted",
+        message: t("cars.messages.image_deleted", "Image deleted"),
       });
-
-      // 3. Обновляем данные на странице (чтобы картинка исчезла визуально)
       invalidate({
         resource: "cars",
         invalidates: ["detail"],
@@ -120,22 +204,42 @@ export const CarEdit = () => {
       });
     }
   };
-  // --- RENDER ---
+
+  if (isLoadingDicts) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="50vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <FormProvider {...methods}>
       <Edit
-        saveButtonProps={{ ...saveButtonProps, disabled: isUploading }}
+        saveButtonProps={{
+          ...saveButtonProps,
+          disabled: isUploading || saveButtonProps.disabled,
+          onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            e.preventDefault();
+            handleSubmit(onFinishHandler)();
+          },
+        }}
         isLoading={isUploading}
         title={
           <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: -2 }}>
             <Tab
-              label="Details"
+              label={t("cars.tabs.details", "Details")}
               icon={<EditIcon />}
               iconPosition="start"
               {...a11yProps(0)}
             />
             <Tab
-              label="Damages"
+              label={t("cars.tabs.damages", "Damages")}
               icon={<CarCrashIcon />}
               iconPosition="start"
               {...a11yProps(1)}
@@ -144,9 +248,9 @@ export const CarEdit = () => {
         }
       >
         <CustomTabPanel value={activeTab} index={0}>
-          {/* Старая форма живет тут */}
           <CarDetailsTab
             carData={carData}
+            dicts={dicts}
             selectedFiles={selectedFiles}
             handleFileChange={handleFileChange}
             removeFile={removeFile}
@@ -158,11 +262,15 @@ export const CarEdit = () => {
         </CustomTabPanel>
 
         <CustomTabPanel value={activeTab} index={1}>
-          {/* Новая таблица повреждений */}
           {carData?.id ? (
             <CarDamagesTab carId={carData.id} />
           ) : (
-            <Box p={3}>Save the car first to add damages.</Box>
+            <Box p={3}>
+              {t(
+                "cars.messages.save_first",
+                "Save the car first to add damages.",
+              )}
+            </Box>
           )}
         </CustomTabPanel>
       </Edit>
