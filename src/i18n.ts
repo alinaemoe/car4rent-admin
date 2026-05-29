@@ -130,6 +130,35 @@ i18n
               deleteConfirm: "Delete this FAQ?",
             },
           },
+          news: {
+            titles: {
+              list: "News",
+              create: "Create News",
+              edit: "Edit News",
+              show: "News Details",
+            },
+            fields: {
+              id: "ID",
+              title: "Title",
+              text: "Text",
+              badge: "Badge",
+              image: "Image",
+              is_active: "Active",
+              created_at: "Created At",
+            },
+            sections: {
+              title: "Title",
+              text: "Text",
+              badge: "Badge",
+              image: "Image",
+              preview: "Preview",
+            },
+            messages: {
+              deleteConfirm: "Delete this news item?",
+            },
+            uploading: "Uploading...",
+            uploadImage: "Upload Image",
+          },
           cars: {
             sections: {
               basicInfo: "Basic Info",
@@ -387,6 +416,35 @@ i18n
             messages: {
               deleteConfirm: "Удалить этот вопрос?",
             },
+          },
+          news: {
+            titles: {
+              list: "Новости",
+              create: "Создать новость",
+              edit: "Редактировать новость",
+              show: "Детали новости",
+            },
+            fields: {
+              id: "ID",
+              title: "Заголовок",
+              text: "Текст",
+              badge: "Бейдж",
+              image: "Изображение",
+              is_active: "Активен",
+              created_at: "Дата создания",
+            },
+            sections: {
+              title: "Заголовок",
+              text: "Текст",
+              badge: "Бейдж",
+              image: "Изображение",
+              preview: "Просмотр",
+            },
+            messages: {
+              deleteConfirm: "Удалить эту новость?",
+            },
+            uploading: "Загрузка...",
+            uploadImage: "Загрузить изображение",
           },
           cars: {
             sections: {

@@ -43,6 +43,24 @@ const customDataProvider = {
         total: Array.isArray(response.data) ? response.data.length : 0,
       };
     }
+    if (resource === "news") {
+      const { pagination, sorters, filters } = rest;
+      const _start = pagination?.current && pagination?.pageSize
+        ? (pagination.current - 1) * pagination.pageSize
+        : 0;
+      const _end = pagination?.current && pagination?.pageSize
+        ? pagination.current * pagination.pageSize
+        : 10;
+      const _sort = sorters?.[0]?.field || "created_at";
+      const _order = sorters?.[0]?.order || "desc";
+      const response = await axiosInstance.get(`${API_URL}/news/admin/all`, {
+        params: { _start, _end, _sort, _order },
+      });
+      return {
+        data: Array.isArray(response.data) ? response.data : [],
+        total: parseInt(response.headers["x-total-count"] || "0", 10),
+      };
+    }
     return baseProvider.getList({ resource, ...rest });
   },
 };
@@ -69,6 +87,10 @@ import { DocumentList } from "./pages/documents/list";
 import { FaqList } from "./pages/faq/list";
 import { FaqCreate } from "./pages/faq/create";
 import { FaqEdit } from "./pages/faq/edit";
+import { NewsList } from "./pages/news/list";
+import { NewsCreate } from "./pages/news/create";
+import { NewsEdit } from "./pages/news/edit";
+import { NewsShow } from "./pages/news/show";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -149,6 +171,14 @@ function App() {
                     list: "/faq",
                     create: "/faq/create",
                     edit: "/faq/edit/:id",
+                    meta: { canDelete: true },
+                  },
+                  {
+                    name: "news",
+                    list: "/news",
+                    create: "/news/create",
+                    edit: "/news/edit/:id",
+                    show: "/news/show/:id",
                     meta: { canDelete: true },
                   },
                   { name: "locations" }, // Нужно для Location
@@ -243,6 +273,13 @@ function App() {
                       <Route index element={<FaqList />} />
                       <Route path="create" element={<FaqCreate />} />
                       <Route path="edit/:id" element={<FaqEdit />} />
+                    </Route>
+
+                    <Route path="/news">
+                      <Route index element={<NewsList />} />
+                      <Route path="create" element={<NewsCreate />} />
+                      <Route path="edit/:id" element={<NewsEdit />} />
+                      <Route path="show/:id" element={<NewsShow />} />
                     </Route>
 
                     <Route
