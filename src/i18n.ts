@@ -185,6 +185,75 @@ i18n
             uploading: "Uploading...",
             uploadImage: "Upload Image",
           },
+          features: {
+            titles: {
+              list: "Features",
+              create: "Create Feature",
+              edit: "Edit Feature",
+            },
+            fields: {
+              internal_name: "Internal Name",
+              description: "Description",
+              icon: "Icon",
+              icon_url: "Icon URL",
+            },
+            sections: {
+              details: "Details",
+              description: "Description",
+            },
+            messages: {
+              deleteConfirm: "Delete this feature?",
+            },
+          },
+          rental_leads: {
+            titles: {
+              list: "Rental Leads",
+            },
+            fields: {
+              name: "Name",
+              phone: "Phone",
+              car: "Car",
+              start_date: "Start Date",
+              end_date: "End Date",
+              comment: "Comment",
+              status: "Status",
+              created_at: "Created At",
+            },
+            new: "New",
+            processed: "Processed",
+            rejected: "Rejected",
+            process: "Process",
+            reject: "Reject",
+            notSpecified: "Not specified",
+            hint: "Click the status to change, or use the action buttons",
+          },
+          reviews: {
+            titles: {
+              list: "Reviews",
+              create: "Create Review",
+              edit: "Edit Review",
+              show: "Review Details",
+            },
+            fields: {
+              id: "ID",
+              user: "User",
+              car: "Car",
+              rating: "Rating",
+              comment: "Comment",
+              createdAt: "Created At",
+              actions: "Actions",
+            },
+            sections: {
+              userAndCar: "User & Car",
+              review: "Review",
+            },
+            filters: {
+              car: "Car",
+              all: "All",
+            },
+            companyReview: "Company Review",
+            ratingOutOf: "5",
+          },
           cars: {
             sections: {
               basicInfo: "Basic Info",
@@ -497,6 +566,75 @@ i18n
             },
             uploading: "Загрузка...",
             uploadImage: "Загрузить изображение",
+          },
+          features: {
+            titles: {
+              list: "Опции",
+              create: "Создать опцию",
+              edit: "Редактировать опцию",
+            },
+            fields: {
+              internal_name: "Внутреннее имя",
+              description: "Описание",
+              icon: "Иконка",
+              icon_url: "URL иконки",
+            },
+            sections: {
+              details: "Детали",
+              description: "Описание",
+            },
+            messages: {
+              deleteConfirm: "Удалить эту опцию?",
+            },
+          },
+          rental_leads: {
+            titles: {
+              list: "Заявки с лендинга",
+            },
+            fields: {
+              name: "Имя",
+              phone: "Телефон",
+              car: "Автомобиль",
+              start_date: "Дата начала",
+              end_date: "Дата окончания",
+              comment: "Комментарий",
+              status: "Статус",
+              created_at: "Дата создания",
+            },
+            new: "Новая",
+            processed: "Обработана",
+            rejected: "Отклонена",
+            process: "Обработать",
+            reject: "Отклонить",
+            notSpecified: "Не указан",
+            hint: "Нажмите на статус чтобы изменить, или используйте кнопки действий",
+          },
+          reviews: {
+            titles: {
+              list: "Отзывы",
+              create: "Создать отзыв",
+              edit: "Редактировать отзыв",
+              show: "Детали отзыва",
+            },
+            fields: {
+              id: "ID",
+              user: "Пользователь",
+              car: "Автомобиль",
+              rating: "Рейтинг",
+              comment: "Комментарий",
+              createdAt: "Дата создания",
+              actions: "Действия",
+            },
+            sections: {
+              userAndCar: "Пользователь и автомобиль",
+              review: "Отзыв",
+            },
+            filters: {
+              car: "Автомобиль",
+              all: "Все",
+            },
+            companyReview: "Отзыв компании",
+            ratingOutOf: "5",
           },
           cars: {
             sections: {

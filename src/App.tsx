@@ -43,13 +43,50 @@ const customDataProvider = {
         total: Array.isArray(response.data) ? response.data.length : 0,
       };
     }
+    if (resource === "rental-leads") {
+      const { pagination, sorters } = rest;
+      const _start = pagination?.currentPage && pagination?.pageSize
+        ? (pagination.currentPage - 1) * pagination.pageSize
+        : 0;
+      const _end = pagination?.currentPage && pagination?.pageSize
+        ? pagination.currentPage * pagination.pageSize
+        : 50;
+      const _sort = sorters?.[0]?.field || "created_at";
+      const _order = sorters?.[0]?.order || "desc";
+      const response = await axiosInstance.get(
+        `${API_URL}/rental-leads/admin/all`,
+        { params: { _start, _end, _sort, _order } },
+      );
+      return {
+        data: Array.isArray(response.data) ? response.data : [],
+        total: parseInt(response.headers["x-total-count"] || "0", 10),
+      };
+    }
+    if (resource === "features") {
+      const { pagination, sorters } = rest;
+      const _start = pagination?.currentPage && pagination?.pageSize
+        ? (pagination.currentPage - 1) * pagination.pageSize
+        : 0;
+      const _end = pagination?.currentPage && pagination?.pageSize
+        ? pagination.currentPage * pagination.pageSize
+        : 50;
+      const _sort = sorters?.[0]?.field || "internal_name";
+      const _order = sorters?.[0]?.order || "asc";
+      const response = await axiosInstance.get(`${API_URL}/features/admin/all`, {
+        params: { _start, _end, _sort, _order },
+      });
+      return {
+        data: Array.isArray(response.data) ? response.data : [],
+        total: parseInt(response.headers["x-total-count"] || "0", 10),
+      };
+    }
     if (resource === "locations") {
       const { pagination, sorters } = rest;
-      const _start = pagination?.current && pagination?.pageSize
-        ? (pagination.current - 1) * pagination.pageSize
+      const _start = pagination?.currentPage && pagination?.pageSize
+        ? (pagination.currentPage - 1) * pagination.pageSize
         : 0;
-      const _end = pagination?.current && pagination?.pageSize
-        ? pagination.current * pagination.pageSize
+      const _end = pagination?.currentPage && pagination?.pageSize
+        ? pagination.currentPage * pagination.pageSize
         : 50;
       const _sort = sorters?.[0]?.field || "name";
       const _order = sorters?.[0]?.order || "asc";
@@ -63,16 +100,40 @@ const customDataProvider = {
     }
     if (resource === "news") {
       const { pagination, sorters, filters } = rest;
-      const _start = pagination?.current && pagination?.pageSize
-        ? (pagination.current - 1) * pagination.pageSize
+      const _start = pagination?.currentPage && pagination?.pageSize
+        ? (pagination.currentPage - 1) * pagination.pageSize
         : 0;
-      const _end = pagination?.current && pagination?.pageSize
-        ? pagination.current * pagination.pageSize
+      const _end = pagination?.currentPage && pagination?.pageSize
+        ? pagination.currentPage * pagination.pageSize
         : 10;
       const _sort = sorters?.[0]?.field || "created_at";
       const _order = sorters?.[0]?.order || "desc";
       const response = await axiosInstance.get(`${API_URL}/news/admin/all`, {
         params: { _start, _end, _sort, _order },
+      });
+      return {
+        data: Array.isArray(response.data) ? response.data : [],
+        total: parseInt(response.headers["x-total-count"] || "0", 10),
+      };
+    }
+    if (resource === "reviews") {
+      const { pagination, sorters, filters } = rest;
+      const _start = pagination?.currentPage && pagination?.pageSize
+        ? (pagination.currentPage - 1) * pagination.pageSize
+        : 0;
+      const _end = pagination?.currentPage && pagination?.pageSize
+        ? pagination.currentPage * pagination.pageSize
+        : 10;
+      const _sort = sorters?.[0]?.field || "created_at";
+      const _order = sorters?.[0]?.order || "desc";
+      const params: Record<string, any> = { _start, _end, _sort, _order };
+      if (filters) {
+        const ratingFilter = filters.find((f: any) => f.field === "rating");
+        if (ratingFilter?.value) params.rating = ratingFilter.value;
+      }
+      if (rest.meta?.car_id) params.car_id = rest.meta.car_id;
+      const response = await axiosInstance.get(`${API_URL}/reviews/admin/all`, {
+        params,
       });
       return {
         data: Array.isArray(response.data) ? response.data : [],
@@ -112,6 +173,14 @@ import { NewsShow } from "./pages/news/show";
 import { LocationList } from "./pages/locations/list";
 import { LocationCreate } from "./pages/locations/create";
 import { LocationEdit } from "./pages/locations/edit";
+import { FeatureList } from "./pages/features/list";
+import { FeatureCreate } from "./pages/features/create";
+import { FeatureEdit } from "./pages/features/edit";
+import { RentalLeadList } from "./pages/rental-leads/list";
+import { ReviewList } from "./pages/reviews/list";
+import { ReviewCreate } from "./pages/reviews/create";
+import { ReviewEdit } from "./pages/reviews/edit";
+import { ReviewShow } from "./pages/reviews/show";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -209,7 +278,26 @@ function App() {
                     edit: "/locations/edit/:id",
                     meta: { canDelete: true },
                   },
-                  { name: "features" },
+                  {
+                    name: "features",
+                    list: "/features",
+                    create: "/features/create",
+                    edit: "/features/edit/:id",
+                    meta: { canDelete: true },
+                  },
+                  {
+                    name: "rental-leads",
+                    list: "/rental-leads",
+                    meta: { label: "Rental Leads" },
+                  },
+                  {
+                    name: "reviews",
+                    list: "/reviews",
+                    create: "/reviews/create",
+                    edit: "/reviews/edit/:id",
+                    show: "/reviews/show/:id",
+                    meta: { canDelete: true },
+                  },
                   {
                     name: "car-damages",
                   },
@@ -313,6 +401,23 @@ function App() {
                       <Route index element={<LocationList />} />
                       <Route path="create" element={<LocationCreate />} />
                       <Route path="edit/:id" element={<LocationEdit />} />
+                    </Route>
+
+                    <Route path="/features">
+                      <Route index element={<FeatureList />} />
+                      <Route path="create" element={<FeatureCreate />} />
+                      <Route path="edit/:id" element={<FeatureEdit />} />
+                    </Route>
+
+                    <Route path="/rental-leads">
+                      <Route index element={<RentalLeadList />} />
+                    </Route>
+
+                    <Route path="/reviews">
+                      <Route index element={<ReviewList />} />
+                      <Route path="create" element={<ReviewCreate />} />
+                      <Route path="edit/:id" element={<ReviewEdit />} />
+                      <Route path="show/:id" element={<ReviewShow />} />
                     </Route>
 
                     <Route
