@@ -19,8 +19,34 @@ i18n
               field: "This field is required",
             },
           },
+          actions: {
+            list: "List",
+            create: "Create",
+            edit: "Edit",
+            show: "Show",
+          },
           buttons: {
             addNewPhotos: "Add New Photos",
+          },
+          locations: {
+            titles: {
+              list: "Locations",
+              create: "Create Location",
+              edit: "Edit Location",
+            },
+            fields: {
+              name: "Name",
+              address: "Address",
+              latitude: "Latitude",
+              longitude: "Longitude",
+            },
+            sections: {
+              details: "Details",
+              coordinates: "Coordinates",
+            },
+            messages: {
+              deleteConfirm: "Delete this location?",
+            },
           },
           notifications: {
             imagesUploaded: "New images uploaded",
@@ -306,8 +332,34 @@ i18n
               field: "Поле обязательно для заполнения",
             },
           },
+          actions: {
+            list: "Список",
+            create: "Создать",
+            edit: "Редактировать",
+            show: "Просмотр",
+          },
           buttons: {
             addNewPhotos: "Добавить фото",
+          },
+          locations: {
+            titles: {
+              list: "Локации",
+              create: "Создать локацию",
+              edit: "Редактировать локацию",
+            },
+            fields: {
+              name: "Название",
+              address: "Адрес",
+              latitude: "Широта",
+              longitude: "Долгота",
+            },
+            sections: {
+              details: "Детали",
+              coordinates: "Координаты",
+            },
+            messages: {
+              deleteConfirm: "Удалить эту локацию?",
+            },
           },
           notifications: {
             imagesUploaded: "Новые изображения загружены",

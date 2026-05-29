@@ -43,6 +43,24 @@ const customDataProvider = {
         total: Array.isArray(response.data) ? response.data.length : 0,
       };
     }
+    if (resource === "locations") {
+      const { pagination, sorters } = rest;
+      const _start = pagination?.current && pagination?.pageSize
+        ? (pagination.current - 1) * pagination.pageSize
+        : 0;
+      const _end = pagination?.current && pagination?.pageSize
+        ? pagination.current * pagination.pageSize
+        : 50;
+      const _sort = sorters?.[0]?.field || "name";
+      const _order = sorters?.[0]?.order || "asc";
+      const response = await axiosInstance.get(`${API_URL}/locations/admin/all`, {
+        params: { _start, _end, _sort, _order },
+      });
+      return {
+        data: Array.isArray(response.data) ? response.data : [],
+        total: parseInt(response.headers["x-total-count"] || "0", 10),
+      };
+    }
     if (resource === "news") {
       const { pagination, sorters, filters } = rest;
       const _start = pagination?.current && pagination?.pageSize
@@ -91,6 +109,9 @@ import { NewsList } from "./pages/news/list";
 import { NewsCreate } from "./pages/news/create";
 import { NewsEdit } from "./pages/news/edit";
 import { NewsShow } from "./pages/news/show";
+import { LocationList } from "./pages/locations/list";
+import { LocationCreate } from "./pages/locations/create";
+import { LocationEdit } from "./pages/locations/edit";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -181,7 +202,13 @@ function App() {
                     show: "/news/show/:id",
                     meta: { canDelete: true },
                   },
-                  { name: "locations" }, // Нужно для Location
+                  {
+                    name: "locations",
+                    list: "/locations",
+                    create: "/locations/create",
+                    edit: "/locations/edit/:id",
+                    meta: { canDelete: true },
+                  },
                   { name: "features" },
                   {
                     name: "car-damages",
@@ -280,6 +307,12 @@ function App() {
                       <Route path="create" element={<NewsCreate />} />
                       <Route path="edit/:id" element={<NewsEdit />} />
                       <Route path="show/:id" element={<NewsShow />} />
+                    </Route>
+
+                    <Route path="/locations">
+                      <Route index element={<LocationList />} />
+                      <Route path="create" element={<LocationCreate />} />
+                      <Route path="edit/:id" element={<LocationEdit />} />
                     </Route>
 
                     <Route
