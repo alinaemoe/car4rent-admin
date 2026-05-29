@@ -42,11 +42,14 @@ import { CarEdit } from "./pages/cars/edit";
 import { CarShow } from "./pages/cars/show";
 import { RentalList } from "./pages/rentals/list";
 import { RentalCreate } from "./pages/rentals/create";
+import { RentalEdit } from "./pages/rentals/edit";
+import { RentalShow } from "./pages/rentals/show";
 import { TranslationList } from "./pages/translations/list";
 import { TranslationCreate } from "./pages/translations/create";
 import { TranslationEdit } from "./pages/translations/edit";
 import { PartnershipRequestList } from "./pages/partnership-requests/list";
 import { PartnershipRequestShow } from "./pages/partnership-requests/show";
+import { DocumentList } from "./pages/documents/list";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -85,6 +88,7 @@ function App() {
                     list: "/rentals",
                     show: "/rentals/show/:id",
                     create: "/rentals/create",
+                    edit: "/rentals/edit/:id",
                   },
                   {
                     name: "documents",
@@ -195,8 +199,12 @@ function App() {
                     <Route path="/rentals">
                       <Route index element={<RentalList />} />
                       <Route path="create" element={<RentalCreate />} />
-                      {/* <Route path="edit/:id" element={<RentalEdit />} />
-                       <Route path="show/:id" element={<RentalShow />} />  */}
+                      <Route path="edit/:id" element={<RentalEdit />} />
+                      <Route path="show/:id" element={<RentalShow />} />
+                    </Route>
+
+                    <Route path="/documents">
+                      <Route index element={<DocumentList />} />
                     </Route>
 
                     <Route path="/translations">

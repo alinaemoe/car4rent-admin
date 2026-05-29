@@ -21,7 +21,7 @@ import { DateField } from "@refinedev/mui";
 export const PartnershipRequestShow = () => {
   const t = useTranslate(); // 👈 Добавили хук перевода
   const { query } = useShow() as any;
-  const { mutate, isLoading: isUpdating } = useUpdate();
+  const { mutate, isLoading: isUpdating } = useUpdate() as any;
 
   const isLoading = query?.isLoading;
   const record = query?.data?.data;

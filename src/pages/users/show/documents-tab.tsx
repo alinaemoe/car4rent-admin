@@ -25,7 +25,8 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import { API_URL } from "../../../utility/axios-instance"; // Или просто хардкод URL
+import { API_URL } from "../../../utility/axios-instance";
+import { DocumentPreviewDialog } from "../../../components/documents/document-preview-dialog";
 
 interface DocumentsTabProps {
   userId: string | number;
@@ -34,6 +35,9 @@ interface DocumentsTabProps {
 export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
   const t = useTranslate();
   const invalidate = useInvalidate(); // Чтобы обновить список после действий
+
+  // Состояние для предпросмотра документа
+  const [previewDoc, setPreviewDoc] = useState<any>(null);
 
   // Состояние для модалки отказа
   const [rejectDialog, setRejectDialog] = useState<{
@@ -140,7 +144,8 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
                   doc.image_url || "https://placehold.co/600x400?text=No+Image"
                 }
                 alt="Document"
-                sx={{ objectFit: "cover", bgcolor: "#f5f5f5" }}
+                sx={{ objectFit: "cover", bgcolor: "#f5f5f5", cursor: "pointer" }}
+                onClick={() => setPreviewDoc(doc)}
               />
 
               <CardContent>
@@ -230,6 +235,22 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Диалог предпросмотра документа */}
+      <DocumentPreviewDialog
+        open={!!previewDoc}
+        doc={previewDoc}
+        onClose={() => setPreviewDoc(null)}
+        onVerify={(id) => {
+          handleVerify(id);
+          setPreviewDoc(null);
+        }}
+        onReject={(id) => {
+          setRejectDialog({ open: true, docId: id });
+          setPreviewDoc(null);
+        }}
+        isPending={isPending}
+      />
     </Box>
   );
 };
