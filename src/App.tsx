@@ -31,6 +31,22 @@ import { ColorModeContextProvider } from "./contexts/color-mode";
 import { axiosInstance, API_URL } from "./utility/axios-instance";
 import { AppSettingsProvider } from "./contexts/app-settings";
 
+const baseProvider = dataProvider(API_URL, axiosInstance);
+
+const customDataProvider = {
+  ...baseProvider,
+  getList: async ({ resource, ...rest }: any) => {
+    if (resource === "faq") {
+      const response = await axiosInstance.get(`${API_URL}/faq/admin`);
+      return {
+        data: Array.isArray(response.data) ? response.data : [],
+        total: Array.isArray(response.data) ? response.data.length : 0,
+      };
+    }
+    return baseProvider.getList({ resource, ...rest });
+  },
+};
+
 import { UserList } from "./pages/users/list";
 import { Header } from "./components/header";
 import { UserEdit } from "./pages/users/edit";
@@ -50,6 +66,9 @@ import { TranslationEdit } from "./pages/translations/edit";
 import { PartnershipRequestList } from "./pages/partnership-requests/list";
 import { PartnershipRequestShow } from "./pages/partnership-requests/show";
 import { DocumentList } from "./pages/documents/list";
+import { FaqList } from "./pages/faq/list";
+import { FaqCreate } from "./pages/faq/create";
+import { FaqEdit } from "./pages/faq/edit";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -69,7 +88,7 @@ function App() {
           <RefineKbarProvider>
             <RefineSnackbarProvider>
               <Refine
-                dataProvider={dataProvider(API_URL, axiosInstance)}
+                dataProvider={customDataProvider}
                 notificationProvider={useNotificationProvider}
                 routerProvider={routerBindings}
                 i18nProvider={i18nProvider}
@@ -124,6 +143,13 @@ function App() {
                       canDelete: true,
                       icon: <TranslateIcon />,
                     },
+                  },
+                  {
+                    name: "faq",
+                    list: "/faq",
+                    create: "/faq/create",
+                    edit: "/faq/edit/:id",
+                    meta: { canDelete: true },
                   },
                   { name: "locations" }, // Нужно для Location
                   { name: "features" },
@@ -211,6 +237,12 @@ function App() {
                       <Route index element={<TranslationList />} />
                       <Route path="create" element={<TranslationCreate />} />
                       <Route path="edit/:id" element={<TranslationEdit />} />
+                    </Route>
+
+                    <Route path="/faq">
+                      <Route index element={<FaqList />} />
+                      <Route path="create" element={<FaqCreate />} />
+                      <Route path="edit/:id" element={<FaqEdit />} />
                     </Route>
 
                     <Route

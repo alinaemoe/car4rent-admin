@@ -109,6 +109,27 @@ i18n
               verifyAll: "Verify All",
             },
           },
+          faq: {
+            titles: {
+              list: "FAQ",
+              create: "Create FAQ",
+              edit: "Edit FAQ",
+            },
+            fields: {
+              question: "Question",
+              answer: "Answer",
+              order_index: "Order",
+              is_active: "Active",
+              created_at: "Created At",
+            },
+            sections: {
+              question: "Question",
+              answer: "Answer",
+            },
+            messages: {
+              deleteConfirm: "Delete this FAQ?",
+            },
+          },
           cars: {
             sections: {
               basicInfo: "Basic Info",
@@ -344,6 +365,27 @@ i18n
               reject: "Отклонить",
               rejectReason: "Причина отказа",
               verifyAll: "Подтвердить все",
+            },
+          },
+          faq: {
+            titles: {
+              list: "FAQ",
+              create: "Создать FAQ",
+              edit: "Редактировать FAQ",
+            },
+            fields: {
+              question: "Вопрос",
+              answer: "Ответ",
+              order_index: "Порядок",
+              is_active: "Активен",
+              created_at: "Дата создания",
+            },
+            sections: {
+              question: "Вопрос",
+              answer: "Ответ",
+            },
+            messages: {
+              deleteConfirm: "Удалить этот вопрос?",
             },
           },
           cars: {
