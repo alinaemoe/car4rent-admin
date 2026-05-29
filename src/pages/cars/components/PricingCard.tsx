@@ -33,7 +33,7 @@ export const PricingCard = () => {
             label={t("cars.fields.price", "Price / Day")}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">₽</InputAdornment>
+                <InputAdornment position="start">Br</InputAdornment>
               ),
             }}
             InputLabelProps={{ shrink: true }}
@@ -47,7 +47,7 @@ export const PricingCard = () => {
             label={t("cars.fields.deposit", "Deposit")}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">₽</InputAdornment>
+                <InputAdornment position="start">Br</InputAdornment>
               ),
             }}
             InputLabelProps={{ shrink: true }}
@@ -77,10 +77,10 @@ export const PricingCard = () => {
             {...register("price_per_km_over_limit", { valueAsNumber: true })}
             fullWidth
             type="number"
-            label={t("cars.fields.overlimit", "Penalty Over Limit (₽/km)")}
+            label={t("cars.fields.overlimit", "Penalty Over Limit (Br/km)")}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">₽</InputAdornment>
+                <InputAdornment position="start">Br</InputAdornment>
               ),
             }}
             InputLabelProps={{ shrink: true }}
