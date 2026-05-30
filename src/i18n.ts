@@ -254,6 +254,52 @@ i18n
             companyReview: "Company Review",
             ratingOutOf: "5",
           },
+          transactions: {
+            titles: {
+              list: "Transactions",
+              dashboard: "Analytics Dashboard",
+            },
+            fields: {
+              id: "ID",
+              rental: "Rental ID",
+              car: "Car",
+              lessor: "Lessor",
+              totalAmount: "Total",
+              systemFee: "Fee",
+              lessorIncome: "Income",
+              payoutStatus: "Payout",
+              type: "Type",
+              createdAt: "Created",
+            },
+            stats: {
+              totalRevenue: "Total Revenue",
+              pendingPayouts: "Pending Payouts",
+              systemFees: "System Fees",
+              transactionCount: "Transactions",
+            },
+            charts: {
+              monthlyRevenue: "Monthly Revenue (Last 6 Months)",
+              payoutStatus: "Payout Status",
+            },
+            filters: {
+              payoutStatus: "Payout Status",
+              type: "Type",
+              fromDate: "From",
+              toDate: "To",
+              all: "All",
+              clear: "Clear Filters",
+            },
+            payoutStatus: {
+              notApplicable: "N/A",
+              pending: "Pending",
+              paid: "Paid",
+            },
+            type: {
+              rentalPayment: "Rental Payment",
+              penalty: "Penalty",
+              damageCompensation: "Damage Comp.",
+            },
+          },
           cars: {
             sections: {
               basicInfo: "Basic Info",
@@ -635,6 +681,52 @@ i18n
             },
             companyReview: "Отзыв компании",
             ratingOutOf: "5",
+          },
+          transactions: {
+            titles: {
+              list: "Транзакции",
+              dashboard: "Аналитика",
+            },
+            fields: {
+              id: "ID",
+              rental: "ID аренды",
+              car: "Автомобиль",
+              lessor: "Арентодатель",
+              totalAmount: "Сумма",
+              systemFee: "Комиссия",
+              lessorIncome: "Доход",
+              payoutStatus: "Выплата",
+              type: "Тип",
+              createdAt: "Создана",
+            },
+            stats: {
+              totalRevenue: "Общий доход",
+              pendingPayouts: "Ожидают выплаты",
+              systemFees: "Комиссии систем",
+              transactionCount: "Транзакций",
+            },
+            charts: {
+              monthlyRevenue: "Месячный доход (последние 6 мес.)",
+              payoutStatus: "Статус выплат",
+            },
+            filters: {
+              payoutStatus: "Статус выплаты",
+              type: "Тип",
+              fromDate: "От",
+              toDate: "До",
+              all: "Все",
+              clear: "Сбросить фильтры",
+            },
+            payoutStatus: {
+              notApplicable: "Н/Д",
+              pending: "В обработке",
+              paid: "Выплачено",
+            },
+            type: {
+              rentalPayment: "Аренда",
+              penalty: "Штраф",
+              damageCompensation: "Ущерб",
+            },
           },
           cars: {
             sections: {

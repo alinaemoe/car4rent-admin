@@ -140,6 +140,35 @@ const customDataProvider = {
         total: parseInt(response.headers["x-total-count"] || "0", 10),
       };
     }
+    if (resource === "transactions") {
+      const { pagination, sorters, filters } = rest;
+      const _start = pagination?.currentPage && pagination?.pageSize
+        ? (pagination.currentPage - 1) * pagination.pageSize
+        : 0;
+      const _end = pagination?.currentPage && pagination?.pageSize
+        ? pagination.currentPage * pagination.pageSize
+        : 25;
+      const _sort = sorters?.[0]?.field || "created_at";
+      const _order = sorters?.[0]?.order || "desc";
+      const params: Record<string, any> = { _start, _end, _sort, _order };
+      if (filters) {
+        const payoutFilter = filters.find((f: any) => f.field === "payout_status");
+        if (payoutFilter?.value) params.payout_status = payoutFilter.value;
+        const typeFilter = filters.find((f: any) => f.field === "type");
+        if (typeFilter?.value) params.type = typeFilter.value;
+        const fromDateFilter = filters.find((f: any) => f.field === "from_date");
+        if (fromDateFilter?.value) params.from_date = fromDateFilter.value;
+        const toDateFilter = filters.find((f: any) => f.field === "to_date");
+        if (toDateFilter?.value) params.to_date = toDateFilter.value;
+      }
+      const response = await axiosInstance.get(`${API_URL}/transactions/admin/all`, {
+        params,
+      });
+      return {
+        data: Array.isArray(response.data) ? response.data : [],
+        total: parseInt(response.headers["x-total-count"] || "0", 10),
+      };
+    }
     return baseProvider.getList({ resource, ...rest });
   },
 };
@@ -181,6 +210,7 @@ import { ReviewList } from "./pages/reviews/list";
 import { ReviewCreate } from "./pages/reviews/create";
 import { ReviewEdit } from "./pages/reviews/edit";
 import { ReviewShow } from "./pages/reviews/show";
+import { TransactionList } from "./pages/transactions/list";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -297,6 +327,11 @@ function App() {
                     edit: "/reviews/edit/:id",
                     show: "/reviews/show/:id",
                     meta: { canDelete: true },
+                  },
+                  {
+                    name: "transactions",
+                    list: "/transactions",
+                    meta: { label: "Transactions" },
                   },
                   {
                     name: "car-damages",
@@ -418,6 +453,10 @@ function App() {
                       <Route path="create" element={<ReviewCreate />} />
                       <Route path="edit/:id" element={<ReviewEdit />} />
                       <Route path="show/:id" element={<ReviewShow />} />
+                    </Route>
+
+                    <Route path="/transactions">
+                      <Route index element={<TransactionList />} />
                     </Route>
 
                     <Route
