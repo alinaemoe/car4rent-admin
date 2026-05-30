@@ -9,8 +9,6 @@ import {
   useNotificationProvider,
   RefineSnackbarProvider,
   ThemedLayout,
-  // ThemedHeader нам больше не нужен из библиотеки, у нас свой!
-  ThemedTitle,
   AuthPage,
 } from "@refinedev/mui";
 import TranslateIcon from "@mui/icons-material/Translate";
@@ -20,6 +18,8 @@ import LanguageIcon from "@mui/icons-material/Language";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import routerBindings, {
   CatchAllNavigate,
   DocumentTitleHandler,
@@ -236,6 +236,7 @@ import { LocationEdit } from "./pages/locations/edit";
 import { FeatureList } from "./pages/features/list";
 import { FeatureCreate } from "./pages/features/create";
 import { FeatureEdit } from "./pages/features/edit";
+import { CarDamageList } from "./pages/car-damages/list";
 import { RentalLeadList } from "./pages/rental-leads/list";
 import { ReviewList } from "./pages/reviews/list";
 import { ReviewCreate } from "./pages/reviews/create";
@@ -388,6 +389,8 @@ function App() {
                   },
                   {
                     name: "car-damages",
+                    list: "/car-damages",
+                    meta: { label: "Car Damages" },
                   },
                 ]}
                 options={{
@@ -421,11 +424,28 @@ function App() {
                         <ThemedLayout
                           Header={Header}
                           Title={({ collapsed }) => (
-                            <ThemedTitle
-                              collapsed={collapsed}
-                              text="Car4Rent"
-                              icon={collapsed ? "C" : "Car4Rent"}
-                            />
+                            <Box
+                              sx={{
+                                px: 2,
+                                py: 1.5,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <Typography
+                                variant="h6"
+                                fontWeight="bold"
+                                noWrap
+                                sx={{
+                                  color: "primary.main",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                              >
+                                {collapsed ? "C" : "Car4Rent"}
+                              </Typography>
+                            </Box>
                           )}
                         >
                           <Outlet />
@@ -523,6 +543,10 @@ function App() {
                       <Route index element={<LanguageList />} />
                       <Route path="create" element={<LanguageCreate />} />
                       <Route path="edit/:id" element={<LanguageEdit />} />
+                    </Route>
+
+                    <Route path="/car-damages">
+                      <Route index element={<CarDamageList />} />
                     </Route>
 
                     <Route

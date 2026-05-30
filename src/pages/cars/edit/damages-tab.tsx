@@ -34,10 +34,11 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { API_URL, axiosInstance } from "../../../utility/axios-instance";
 import { CenteredCell } from "../../../components/common/centered-cell";
 
-// ENUMS
 const DAMAGE_TYPES = [
   { value: "SCRATCH", label: "Scratch" },
   { value: "DENT", label: "Dent" },
+  { value: "CRACK", label: "Crack" },
+  { value: "BROKEN_PART", label: "Broken Part" },
   { value: "SALON", label: "Interior/Salon" },
   { value: "WHEEL", label: "Wheel" },
   { value: "OTHER", label: "Other" },
@@ -61,7 +62,7 @@ export const CarDamagesTab = ({ carId }: DamagesTabProps) => {
     filters: [{ field: "carId", operator: "eq", value: carId }],
   }) as any;
 
-  const rows = result?.data || [];
+  const rows = result?.data?.data || [];
   const isLoading = query?.isLoading;
 
   // --- HANDLERS ---

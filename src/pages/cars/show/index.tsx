@@ -26,7 +26,7 @@ import {
   a11yProps,
 } from "../../../components/common/custom-tab-panel";
 import { CarRentalsTab } from "./rentals-tab";
-import { CarDamagesTab } from "../edit/damages-tab"; // Можно переиспользовать компонент из Edit, он достаточно универсален
+import { DamagesTab } from "./components/DamagesTab";
 
 export const CarShow = () => {
   // const t = useTranslate();
@@ -158,11 +158,9 @@ export const CarShow = () => {
           <CarRentalsTab carId={record.id} />
         </CustomTabPanel>
 
-        {/* 3. DAMAGES TAB */}
+        {/* 3. DAMAGES TAB — 3D Interactive */}
         <CustomTabPanel value={activeTab} index={2}>
-          {/* Переиспользуем компонент. Если нужно скрыть кнопки редактирования для Show,
-               можно добавить проп readOnly в CarDamagesTab */}
-          <CarDamagesTab carId={record.id} />
+          <DamagesTab carId={record.id} />
         </CustomTabPanel>
       </Box>
     </Show>
