@@ -232,6 +232,7 @@ export const RentalList = () => {
         columns={columns}
         autoHeight
         density="comfortable"
+        pageSizeOptions={[10, 25, 50, 100]}
         columnVisibilityModel={{
           id: !isMobile,
           start_date: !isMobile,

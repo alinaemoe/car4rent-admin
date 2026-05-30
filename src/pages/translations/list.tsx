@@ -167,6 +167,7 @@ const TranslationListInner = () => {
           rows={rows}
           columns={columns}
           rowHeight={60}
+          pageSizeOptions={[10, 25, 50, 100]}
           slots={{ noRowsOverlay: CustomNoRowsOverlay }}
           sx={{
             border: "none",

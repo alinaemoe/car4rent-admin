@@ -229,6 +229,7 @@ export const UserList = () => {
         columns={columns}
         autoHeight
         density="comfortable"
+        pageSizeOptions={[10, 25, 50, 100]}
         slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         columnVisibilityModel={{
           id: !isMobile,

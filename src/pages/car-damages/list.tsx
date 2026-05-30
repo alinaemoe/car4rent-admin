@@ -371,7 +371,7 @@ export const CarDamageList = () => {
             paginationMode="server"
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
-            pageSizeOptions={[25, 50, 100]}
+            pageSizeOptions={[10, 25, 50, 100]}
             rowHeight={70}
             slots={{ noRowsOverlay: CustomNoRowsOverlay }}
             columnVisibilityModel={{

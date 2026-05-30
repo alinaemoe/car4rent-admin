@@ -149,6 +149,7 @@ export const PartnershipRequestList = () => {
         columns={columns}
         autoHeight
         density="comfortable"
+        pageSizeOptions={[10, 25, 50, 100]}
         slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         sx={{
           border: "none",

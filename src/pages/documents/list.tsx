@@ -472,6 +472,7 @@ export const DocumentList = () => {
           columns={columns}
           autoHeight
           density="comfortable"
+          pageSizeOptions={[10, 25, 50, 100]}
           checkboxSelection
           onRowSelectionModelChange={(newSelection) => {
             setSelectedRows(newSelection);
