@@ -18,6 +18,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import PhoneIcon from "@mui/icons-material/Phone";
 import { useTranslate, useList } from "@refinedev/core";
 import { CenteredCell } from "../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 import { axiosInstance } from "../../utility/axios-instance";
 import { API_URL } from "../../utility/axios-instance";
 
@@ -142,12 +143,12 @@ export const RentalLeadList = () => {
         flex: 1,
         renderCell: ({ value, row }) => (
           <Stack justifyContent="center" sx={{ height: "100%", py: 0.5 }}>
-            <Typography variant="body2" fontWeight={600}>
+            <Typography variant="body2" fontWeight={600} noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
               {value}
             </Typography>
             <Stack direction="row" alignItems="center" spacing={0.5}>
               <PhoneIcon sx={{ fontSize: 12, color: "text.secondary" }} />
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
                 {row.phone}
               </Typography>
             </Stack>
@@ -162,7 +163,7 @@ export const RentalLeadList = () => {
           <Stack justifyContent="center" sx={{ height: "100%", py: 0.5 }}>
             {value ? (
               <>
-                <Typography variant="body2" fontWeight={600}>
+                <Typography variant="body2" fontWeight={600} noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 140 }}>
                   {value.brand} {value.model}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
@@ -344,6 +345,7 @@ export const RentalLeadList = () => {
           end_date: !isMobile,
         }}
         getRowHeight={() => 72}
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {

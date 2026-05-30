@@ -15,6 +15,7 @@ import { useTranslate, useList } from "@refinedev/core";
 
 // Наши компоненты
 import { CenteredCell } from "../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 import {
   FormLanguageProvider,
   useFormLanguage,
@@ -79,7 +80,7 @@ const TranslationListInner = () => {
         width: 250,
         renderCell: ({ value }) => (
           <Box display="flex" alignItems="center" height="100%">
-            <Typography variant="body2" fontWeight="bold" color="primary">
+            <Typography variant="body2" fontWeight="bold" color="primary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
               {value}
             </Typography>
           </Box>
@@ -101,6 +102,8 @@ const TranslationListInner = () => {
                 variant="body2"
                 color={isFallback ? "text.secondary" : "text.primary"}
                 fontStyle={isFallback ? "italic" : "normal"}
+                noWrap
+                sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
               >
                 {val || "—"} {isFallback && "(fallback en)"}
               </Typography>
@@ -168,10 +171,12 @@ const TranslationListInner = () => {
           hideFooter={true}
           loading={isLoading}
           rowHeight={60}
+          slots={{ noRowsOverlay: CustomNoRowsOverlay }}
           sx={{
             border: "none",
             "& .MuiDataGrid-cell": {
-              borderBottom: "1px solid #f0f0f0",
+              borderBottom: "1px solid",
+              borderColor: "divider",
               whiteSpace: "normal",
               lineHeight: "1.3em",
               py: 1,

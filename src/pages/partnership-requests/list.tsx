@@ -14,6 +14,7 @@ import { useTranslate } from "@refinedev/core";
 import { DateField } from "@refinedev/mui";
 
 import { CenteredCell } from "../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 
 export const PartnershipRequestList = () => {
   const t = useTranslate();
@@ -54,10 +55,10 @@ export const PartnershipRequestList = () => {
                 🚗
               </Avatar>
               <Box>
-                <Typography variant="body2" fontWeight="bold">
+                <Typography variant="body2" fontWeight="bold" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160 }}>
                   {row.car_brand} {row.car_model}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160 }}>
                   {t("partnership_requests.fields.year", "Year")}: {row.car_year}
                 </Typography>
               </Box>
@@ -71,10 +72,10 @@ export const PartnershipRequestList = () => {
         width: 200,
         renderCell: ({ row }) => (
           <Stack justifyContent="center" height="100%">
-            <Typography variant="body2" fontWeight="bold">
+            <Typography variant="body2" fontWeight="bold" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
               {row.owner_name}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
               {row.owner_phone}
             </Typography>
           </Stack>
@@ -148,6 +149,7 @@ export const PartnershipRequestList = () => {
         columns={columns}
         autoHeight
         density="comfortable"
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {

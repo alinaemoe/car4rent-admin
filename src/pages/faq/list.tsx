@@ -15,6 +15,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useTranslate, useList } from "@refinedev/core";
 import { CenteredCell } from "../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 import {
   FormLanguageProvider,
   useFormLanguage,
@@ -89,6 +90,8 @@ const FaqListInner = () => {
                 variant="body2"
                 color={isFallback ? "text.secondary" : "text.primary"}
                 fontStyle={isFallback ? "italic" : "normal"}
+                noWrap
+                sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
               >
                 {val || "---"}
               </Typography>
@@ -231,6 +234,7 @@ const FaqListInner = () => {
         columnVisibilityModel={{
           created_at: !isMobile,
         }}
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {

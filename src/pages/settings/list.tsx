@@ -15,6 +15,7 @@ import DataObjectIcon from "@mui/icons-material/DataObject";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import { useTranslate, useList } from "@refinedev/core";
 import { CenteredCell } from "../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 import { useFormLanguage } from "../../contexts/form-language";
 import { FormLanguageProvider } from "../../contexts/form-language";
 import { LanguageTabs } from "../../components/form/language-tabs";
@@ -155,7 +156,7 @@ const SettingListInner = () => {
         flex: 0.7,
         renderCell: ({ value }) => (
           <Stack justifyContent="center" sx={{ height: "100%" }}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
               {value || "—"}
             </Typography>
           </Stack>
@@ -219,6 +220,7 @@ const SettingListInner = () => {
         loading={isLoading}
         hideFooter
         getRowId={(row) => row.key}
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {

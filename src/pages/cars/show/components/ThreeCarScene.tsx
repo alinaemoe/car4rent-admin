@@ -546,7 +546,7 @@ export default function ThreeCarScene({
   previewCoords,
 }: ThreeCarSceneProps) {
   const theme = useTheme();
-  const canvasBgColor = theme.palette.mode === "dark" ? "#1a1a2e" : "#e8ecf1";
+  const canvasBgColor = theme.palette.background.default;
 
   return (
     <Box

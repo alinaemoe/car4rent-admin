@@ -33,6 +33,7 @@ import BuildIcon from "@mui/icons-material/Build";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { API_URL, axiosInstance } from "../../../utility/axios-instance";
 import { CenteredCell } from "../../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../../components/common/custom-no-rows-overlay";
 
 const DAMAGE_TYPES = [
   { value: "SCRATCH", label: "Scratch" },
@@ -195,6 +196,7 @@ export const CarDamagesTab = ({ carId }: DamagesTabProps) => {
         rowHeight={70}
         hideFooter
         loading={isLoading}
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         sx={{ border: "none" }}
       />
 

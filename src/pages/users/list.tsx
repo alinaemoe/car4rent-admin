@@ -7,6 +7,7 @@ import {
   ShowButton,
 } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 import { Avatar, Chip, Stack, useMediaQuery, Theme } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -228,6 +229,7 @@ export const UserList = () => {
         columns={columns}
         autoHeight
         density="comfortable"
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         columnVisibilityModel={{
           id: !isMobile,
           created_at: !isMobile,

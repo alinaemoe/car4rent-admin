@@ -49,6 +49,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 
 import { CenteredCell } from "../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 import { API_URL, axiosInstance } from "../../utility/axios-instance";
 
 const ThreeCarScene = lazy(
@@ -56,13 +57,13 @@ const ThreeCarScene = lazy(
 );
 
 const DAMAGE_TYPES = [
-  { value: "SCRATCH", color: "#ff9800" },
-  { value: "DENT", color: "#f44336" },
-  { value: "CRACK", color: "#9c27b0" },
-  { value: "BROKEN_PART", color: "#e91e63" },
-  { value: "SALON", color: "#2196f3" },
-  { value: "WHEEL", color: "#607d8b" },
-  { value: "OTHER", color: "#795548" },
+  { value: "SCRATCH", color: "warning.main" },
+  { value: "DENT", color: "error.main" },
+  { value: "CRACK", color: "secondary.main" },
+  { value: "BROKEN_PART", color: "error.light" },
+  { value: "SALON", color: "info.main" },
+  { value: "WHEEL", color: "grey.600" },
+  { value: "OTHER", color: "grey.700" },
 ];
 
 const FILTER_STATUS = ["all", "paid", "unpaid"];
@@ -172,7 +173,7 @@ export const CarDamageList = () => {
           if (!row.car) return <CenteredCell>—</CenteredCell>;
           return (
             <CenteredCell>
-              <Typography variant="body2">
+              <Typography variant="body2" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 140 }}>
                 {row.car.brand} {row.car.model}
               </Typography>
             </CenteredCell>
@@ -317,14 +318,8 @@ export const CarDamageList = () => {
       },
     ];
 
-    if (isMobile) {
-      return baseColumns.filter(
-        (c) => !["id", "repair_cost", "coord", "created_at"].includes(c.field),
-      );
-    }
-
     return baseColumns;
-  }, [t, isMobile]);
+  }, [t]);
 
   return (
     <List>
@@ -373,6 +368,13 @@ export const CarDamageList = () => {
             onPaginationModelChange={setPaginationModel}
             pageSizeOptions={[25, 50, 100]}
             rowHeight={70}
+            slots={{ noRowsOverlay: CustomNoRowsOverlay }}
+            columnVisibilityModel={{
+              id: !isMobile,
+              repair_cost: !isMobile,
+              coord: !isMobile,
+              created_at: !isMobile,
+            }}
             sx={{
               border: "none",
               "& .MuiDataGrid-cell": {

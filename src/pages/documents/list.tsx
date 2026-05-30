@@ -41,6 +41,7 @@ import {
 } from "@refinedev/core";
 import { API_URL } from "../../utility/axios-instance";
 import { CenteredCell } from "../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 import { DocumentPreviewDialog } from "../../components/documents/document-preview-dialog";
 
 interface DocumentRow {
@@ -494,6 +495,7 @@ export const DocumentList = () => {
                 t={t}
               />
             ),
+            noRowsOverlay: CustomNoRowsOverlay,
           }}
           sx={{
             "& .MuiDataGrid-cell": {

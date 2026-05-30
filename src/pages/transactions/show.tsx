@@ -11,6 +11,7 @@ import {
   Paper,
   Card,
   CardContent,
+  CircularProgress,
   LinearProgress,
 } from "@mui/material";
 import {
@@ -49,8 +50,8 @@ export const TransactionShow = () => {
   const isLoading = query?.isLoading;
   const record = query?.data?.data;
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!record) return <div>No data found</div>;
+  if (isLoading) return <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}><CircularProgress /></Box>;
+  if (!record) return <Typography color="text.secondary" sx={{ p: 4 }}>{t("messages.no_data", "No data found")}</Typography>;
 
   const total = Number(record.total_amount);
   const base = Number(record.base_rental_amount);

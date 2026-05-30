@@ -4,6 +4,7 @@ import { List } from "@refinedev/mui";
 import { useDataGrid } from "@refinedev/mui";
 import { DataGrid } from "@mui/x-data-grid";
 import { Typography } from "@mui/material";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 import { axiosInstance, API_URL } from "../../utility/axios-instance";
 import { PayoutStatus, StatsData } from "./types";
 import { payoutStatusLabels } from "./constants";
@@ -114,6 +115,7 @@ export const TransactionList = () => {
         density="comfortable"
         rowHeight={56}
         pageSizeOptions={[10, 25, 50, 100]}
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         sx={{
           "& .MuiDataGrid-cell": { display: "flex", alignItems: "center", overflow: "hidden" },
           "& .MuiDataGrid-row:hover": { backgroundColor: "action.hover" },

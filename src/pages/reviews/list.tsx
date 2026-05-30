@@ -8,6 +8,7 @@ import {
   DeleteButton,
 } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 import {
   Avatar,
   Chip,
@@ -295,8 +296,8 @@ export const ReviewList = () => {
           id: !isMobile,
           created_at: !isMobile,
         }}
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         sx={{
-          // Сглаживаем отображение ячеек при вертикальном выравнивании
           "& .MuiDataGrid-cell": {
             display: "flex",
             alignItems: "center",

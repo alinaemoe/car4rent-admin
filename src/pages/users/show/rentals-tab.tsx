@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { DateField } from "@refinedev/mui";
 import { CenteredCell } from "../../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../../components/common/custom-no-rows-overlay";
 
 interface RentalsTabProps {
   userId: string | number;
@@ -237,10 +238,12 @@ export const RentalsTab = ({ userId }: RentalsTabProps) => {
         columns={columns}
         hideFooter={true}
         rowHeight={90}
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {
-            borderBottom: "1px solid #f0f0f0",
+            borderBottom: "1px solid",
+            borderColor: "divider",
             whiteSpace: "normal",
             lineHeight: "1.3em",
             py: 1,

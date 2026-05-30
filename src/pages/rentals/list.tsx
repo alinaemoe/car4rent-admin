@@ -17,7 +17,8 @@ import {
   Theme,
 } from "@mui/material";
 import { useTranslate } from "@refinedev/core";
-import { CenteredCell } from "../../components/common/centered-cell"; // Импортируй свой компонент
+import { CenteredCell } from "../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 
 export const RentalList = () => {
   const t = useTranslate();
@@ -66,10 +67,10 @@ export const RentalList = () => {
                 🚗
               </Avatar>
               <Box>
-                <Typography variant="body2" fontWeight="bold">
+                <Typography variant="body2" fontWeight="bold" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 180 }}>
                   {car?.brand} {car?.model}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 180 }}>
                   {car?.license_plate}
                 </Typography>
               </Box>
@@ -96,10 +97,10 @@ export const RentalList = () => {
                 {user?.first_name?.[0]}
               </Avatar>
               <Box>
-                <Typography variant="body2">
+                <Typography variant="body2" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160 }}>
                   {user?.first_name} {user?.last_name}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160 }}>
                   {user?.email}
                 </Typography>
               </Box>
@@ -237,6 +238,7 @@ export const RentalList = () => {
           end_date: !isMobile,
           email: !isMobile,
         }}
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {

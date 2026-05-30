@@ -4,6 +4,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useMediaQuery, Theme, Stack, Typography } from "@mui/material";
 import { useTranslate, useList } from "@refinedev/core";
 import { CenteredCell } from "../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 
 interface LocationRow {
   id: number;
@@ -45,7 +46,7 @@ export const LocationList = () => {
         flex: 1,
         renderCell: ({ value }) => (
           <Stack justifyContent="center" sx={{ height: "100%", py: 0.5 }}>
-            <Typography variant="body2" fontWeight={600}>
+            <Typography variant="body2" fontWeight={600} noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
               {value || "---"}
             </Typography>
           </Stack>
@@ -58,7 +59,7 @@ export const LocationList = () => {
         flex: 1,
         renderCell: ({ value }) => (
           <Stack justifyContent="center" sx={{ height: "100%", py: 0.5 }}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
               {value || "---"}
             </Typography>
           </Stack>
@@ -130,6 +131,7 @@ export const LocationList = () => {
           latitude: !isMobile,
           longitude: !isMobile,
         }}
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {

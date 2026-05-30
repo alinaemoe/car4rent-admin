@@ -45,13 +45,13 @@ import { API_URL, axiosInstance } from "../../../../utility/axios-instance";
 const ThreeCarScene = lazy(() => import("./ThreeCarScene"));
 
 const DAMAGE_TYPES = [
-  { value: "SCRATCH", color: "#ff9800" },
-  { value: "DENT", color: "#f44336" },
-  { value: "CRACK", color: "#9c27b0" },
-  { value: "BROKEN_PART", color: "#e91e63" },
-  { value: "SALON", color: "#2196f3" },
-  { value: "WHEEL", color: "#607d8b" },
-  { value: "OTHER", color: "#795548" },
+  { value: "SCRATCH", color: "warning.main" },
+  { value: "DENT", color: "error.main" },
+  { value: "CRACK", color: "secondary.main" },
+  { value: "BROKEN_PART", color: "error.light" },
+  { value: "SALON", color: "info.main" },
+  { value: "WHEEL", color: "grey.600" },
+  { value: "OTHER", color: "grey.700" },
 ];
 
 interface DamagesTabProps {
@@ -342,7 +342,7 @@ function DamageListItem({
   const hasCoords =
     damage.coord_x != null && damage.coord_y != null && damage.coord_z != null;
   const typeColor =
-    DAMAGE_TYPES.find((dt) => dt.value === damage.type)?.color || "#795548";
+    DAMAGE_TYPES.find((dt) => dt.value === damage.type)?.color || "grey.700";
 
   return (
     <Paper

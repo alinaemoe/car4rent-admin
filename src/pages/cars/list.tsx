@@ -19,6 +19,7 @@ import {
 import { useTranslate } from "@refinedev/core";
 
 import { CenteredCell } from "../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 
 export const CarList = () => {
   const t = useTranslate();
@@ -59,10 +60,10 @@ export const CarList = () => {
                 🚗
               </Avatar>
               <Box>
-                <Typography variant="body2" fontWeight="bold">
+                <Typography variant="body2" fontWeight="bold" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 220 }}>
                   {row.brand} {row.model}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 220 }}>
                   {row.year} • {row.license_plate}
                 </Typography>
               </Box>
@@ -120,14 +121,8 @@ export const CarList = () => {
       },
     ];
 
-    if (isMobile) {
-      return baseColumns.filter(
-        (c) => c.field !== "id" && c.field !== "price_per_day",
-      );
-    }
-
     return baseColumns;
-  }, [t, isMobile]);
+  }, [t]);
 
   return (
     <List>
@@ -136,6 +131,11 @@ export const CarList = () => {
         columns={columns}
         autoHeight
         density="comfortable"
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
+        columnVisibilityModel={{
+          id: !isMobile,
+          price_per_day: !isMobile,
+        }}
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {

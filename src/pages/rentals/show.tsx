@@ -8,6 +8,7 @@ import {
   Avatar,
   Chip,
   Box,
+  CircularProgress,
   Divider,
   Tabs,
   Tab,
@@ -31,6 +32,7 @@ import {
 } from "../../components/common/custom-tab-panel";
 import { API_URL } from "../../utility/axios-instance";
 import { CenteredCell } from "../../components/common/centered-cell";
+import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 
 const STATUS_COLORS: Record<string, "success" | "info" | "primary" | "warning" | "default" | "error"> = {
   ACTIVE: "success",
@@ -52,8 +54,8 @@ export const RentalShow = () => {
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => setActiveTab(newValue);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!record) return <div>No data found</div>;
+  if (isLoading) return <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}><CircularProgress /></Box>;
+  if (!record) return <Typography color="text.secondary" sx={{ p: 4 }}>{t("messages.no_data", "No data found")}</Typography>;
 
   const car = record.car;
   const user = record.user;
@@ -352,7 +354,7 @@ const RentalDamagesTab = ({ rentalId, t }: { rentalId: number; t: any }) => {
 
   return (
     <Box sx={{ mt: 2, height: 350, width: "100%" }}>
-      <DataGrid rows={rows} columns={columns} hideFooter loading={query?.isLoading} sx={{ border: "none" }} />
+      <DataGrid rows={rows} columns={columns} hideFooter loading={query?.isLoading} slots={{ noRowsOverlay: CustomNoRowsOverlay }} sx={{ border: "none" }} />
     </Box>
   );
 };
