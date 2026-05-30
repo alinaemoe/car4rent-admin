@@ -32,6 +32,7 @@ import { authProvider } from "./authProvider";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import { axiosInstance, API_URL } from "./utility/axios-instance";
 import { AppSettingsProvider } from "./contexts/app-settings";
+import { SessionExpiredModal } from "./components/common/session-expired-modal";
 
 const baseProvider = dataProvider(API_URL, axiosInstance);
 
@@ -560,6 +561,7 @@ function App() {
                 <RefineKbar />
                 <UnsavedChangesNotifier />
                 <DocumentTitleHandler />
+                <SessionExpiredModal />
               </Refine>
             </RefineSnackbarProvider>
           </RefineKbarProvider>

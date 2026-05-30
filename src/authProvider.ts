@@ -90,24 +90,16 @@ export const authProvider: AuthProvider = {
   },
 
   getIdentity: async () => {
-    try {
-      const { data } = await axiosInstance.get("/users/profile");
-      return data;
-    } catch {
-      const token = localStorage.getItem("access_token");
-      if (!token) return null;
-      const payload = parseJwt(token);
-      if (payload) {
-        return { id: payload.sub, email: payload.email, name: payload.email };
-      }
-      return { id: 1, name: "Admin" };
-    }
+    const { data } = await axiosInstance.get("/users/profile");
+    return {
+      id: data.id,
+      name: `${data.first_name || ""} ${data.last_name || ""}`.trim() || data.email,
+      email: data.email,
+      avatar: data.avatar_url,
+    };
   },
 
   onError: async (error) => {
-    if (error.response?.status === 401) {
-      return { logout: true };
-    }
     return { error };
   },
 };

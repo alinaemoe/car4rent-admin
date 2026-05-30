@@ -686,6 +686,15 @@ i18n
               changeFlag: "Change Flag",
             },
           },
+          auth: {
+            session_expired_title: "Session Expired",
+            session_expired_message:
+              "Your session has expired. Please refresh it to continue working without losing your data.",
+            refresh_session: "Refresh Session",
+            session_refresh_failed:
+              "Failed to refresh session. Please log out and try again.",
+            logout: "Logout",
+          },
         },
       },
       ru: {
@@ -1362,9 +1371,19 @@ i18n
               changeFlag: "Сменить флаг",
             },
           },
+          auth: {
+            session_expired_title: "Сессия истекла",
+            session_expired_message:
+              "Ваша сессия истекла. Пожалуйста, обновите её, чтобы продолжить работу без потери данных.",
+            refresh_session: "Обновить сессию",
+            session_refresh_failed:
+              "Не удалось обновить сессию. Пожалуйста, выйдите и войдите снова.",
+            logout: "Выйти",
+          },
         },
       },
     },
   });
+
 
 export default i18n;
