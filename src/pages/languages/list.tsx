@@ -35,7 +35,7 @@ const LanguageListInner = () => {
 
   const { result, isLoading } = useList<LanguageRow>({
     resource: "languages",
-    pagination: { mode: "off" },
+    pagination: { mode: "off" }, // reference table — always < 100 records
     sorters: [{ field: "code", order: "asc" }],
   }) as any;
 

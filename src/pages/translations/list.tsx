@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { List, EditButton, DeleteButton } from "@refinedev/mui";
+import { List, EditButton, DeleteButton, useDataGrid } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Typography,
@@ -11,7 +11,7 @@ import {
   Stack,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { useTranslate, useList } from "@refinedev/core";
+import { useTranslate } from "@refinedev/core";
 
 // Наши компоненты
 import { CenteredCell } from "../../components/common/centered-cell";
@@ -32,27 +32,14 @@ const TranslationListInner = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Получаем список переводов.
-  // Используем фильтр по полю key (contains), если введен поиск
-  const { result, isLoading } = useList({
+  const { dataGridProps, filters, setFilters } = useDataGrid({
     resource: "translations",
-    filters: searchQuery
-      ? [
-          {
-            field: "key",
-            operator: "contains",
-            value: searchQuery,
-          },
-        ]
-      : [],
-    pagination: { mode: "off" }, // Для переводов обычно отключают пагинацию
-    sorters: [{ field: "id", order: "desc" }],
-  }) as any;
+    pagination: { currentPage: 1, pageSize: 25 },
+    sorters: { initial: [{ field: "id", order: "desc" }] },
+  });
 
-  // Опционально: можно фильтровать еще и на клиенте по value,
-  // чтобы поиск искал и по самим переводам
   const rows = useMemo(() => {
-    const data = result?.data || [];
+    const data = (dataGridProps.rows as any[]) || [];
     if (!searchQuery) return data;
 
     const lowerQuery = searchQuery.toLowerCase();
@@ -64,7 +51,7 @@ const TranslationListInner = () => {
       if (val.toLowerCase().includes(lowerQuery)) return true;
       return false;
     });
-  }, [result?.data, searchQuery, activeLang]);
+  }, [dataGridProps.rows, searchQuery, activeLang]);
 
   const columns = useMemo<GridColDef[]>(() => {
     const baseColumns: GridColDef[] = [
@@ -146,7 +133,17 @@ const TranslationListInner = () => {
           size="small"
           placeholder={t("search.placeholder", "Search key or value...")}
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            setSearchQuery(value);
+            const current = (filters as any[]) || [];
+            const other = current.filter((f: any) => f.field !== "key_like");
+            if (value) {
+              setFilters([...other, { field: "key_like", operator: "contains", value } as any]);
+            } else {
+              setFilters(other);
+            }
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -166,10 +163,9 @@ const TranslationListInner = () => {
       {/* ТАБЛИЦА */}
       <Box sx={{ height: 600, width: "100%" }}>
         <DataGrid
+          {...dataGridProps}
           rows={rows}
           columns={columns}
-          hideFooter={true}
-          loading={isLoading}
           rowHeight={60}
           slots={{ noRowsOverlay: CustomNoRowsOverlay }}
           sx={{

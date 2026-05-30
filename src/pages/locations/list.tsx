@@ -22,7 +22,7 @@ export const LocationList = () => {
 
   const { result, isLoading } = useList<LocationRow>({
     resource: "locations",
-    pagination: { mode: "off" },
+    pagination: { mode: "off" }, // reference table — always < 100 records
     sorters: [{ field: "name", order: "asc" }],
   }) as any;
 

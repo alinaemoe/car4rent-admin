@@ -43,7 +43,7 @@ const FaqListInner = () => {
 
   const { result, isLoading } = useList<FaqRow>({
     resource: "faq",
-    pagination: { mode: "off" },
+    pagination: { mode: "off" }, // reference table — always < 100 records
     sorters: [
       { field: "order_index", order: "asc" },
       { field: "created_at", order: "desc" },

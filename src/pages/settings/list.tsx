@@ -52,7 +52,7 @@ const SettingListInner = () => {
 
   const { result, isLoading } = useList<SettingRow>({
     resource: "settings",
-    pagination: { mode: "off" },
+    pagination: { mode: "off" }, // reference table — always < 100 records
     sorters: [{ field: "key", order: "asc" }],
   }) as any;
 

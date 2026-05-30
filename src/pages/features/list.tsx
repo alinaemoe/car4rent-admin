@@ -38,7 +38,7 @@ const FeatureListInner = () => {
 
   const { result, isLoading } = useList<FeatureRow>({
     resource: "features",
-    pagination: { mode: "off" },
+    pagination: { mode: "off" }, // reference table — always < 100 records
     sorters: [{ field: "internal_name", order: "asc" }],
   }) as any;
 

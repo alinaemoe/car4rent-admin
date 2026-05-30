@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { List, EditButton, DeleteButton, DateField } from "@refinedev/mui";
+import { List, EditButton, DeleteButton, DateField, useDataGrid } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Typography,
@@ -15,7 +15,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useTranslate, useList } from "@refinedev/core";
+import { useTranslate } from "@refinedev/core";
 import { CenteredCell } from "../../components/common/centered-cell";
 import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 import {
@@ -42,14 +42,14 @@ const NewsListInner = () => {
   const { activeLang } = useFormLanguage();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { result, isLoading } = useList<NewsRow>({
+  const { dataGridProps } = useDataGrid<NewsRow>({
     resource: "news",
-    pagination: { mode: "off" },
-    sorters: [{ field: "created_at", order: "desc" }],
-  }) as any;
+    pagination: { currentPage: 1, pageSize: 25 },
+    sorters: { initial: [{ field: "created_at", order: "desc" }] },
+  });
 
   const rows = useMemo(() => {
-    const data = result?.data || [];
+    const data = (dataGridProps.rows as NewsRow[]) || [];
     if (!searchQuery) return data;
 
     const lowerQuery = searchQuery.toLowerCase();
@@ -61,7 +61,7 @@ const NewsListInner = () => {
         badge.toLowerCase().includes(lowerQuery)
       );
     });
-  }, [result?.data, searchQuery, activeLang]);
+  }, [dataGridProps.rows, searchQuery, activeLang]);
 
   const columns = useMemo<GridColDef<NewsRow>[]>(
     () => [
@@ -220,12 +220,11 @@ const NewsListInner = () => {
       </Stack>
 
       <DataGrid
+        {...dataGridProps}
         rows={rows}
         columns={columns}
         autoHeight
         density="comfortable"
-        loading={isLoading}
-        hideFooter
         columnVisibilityModel={{
           created_at: !isMobile,
         }}

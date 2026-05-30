@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { List, DateField } from "@refinedev/mui";
+import { List, DateField, useDataGrid } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Typography,
@@ -16,7 +16,7 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import PhoneIcon from "@mui/icons-material/Phone";
-import { useTranslate, useList } from "@refinedev/core";
+import { useTranslate, useInvalidate } from "@refinedev/core";
 import { CenteredCell } from "../../components/common/centered-cell";
 import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 import { axiosInstance } from "../../utility/axios-instance";
@@ -93,19 +93,13 @@ export const RentalLeadList = () => {
     theme.breakpoints.down("md"),
   );
   const [updatingId, setUpdatingId] = useState<number | null>(null);
-  const [snackMessage, setSnackMessage] = useState<string | null>(null);
+  const invalidate = useInvalidate();
 
-  const { result, isLoading } = useList<RentalLeadRow>({
+  const { dataGridProps } = useDataGrid<RentalLeadRow>({
     resource: "rental-leads",
-    pagination: { mode: "off" },
-    sorters: [{ field: "created_at", order: "desc" }],
-  }) as any;
-
-  const [leads, setLeads] = useState<RentalLeadRow[]>([]);
-
-  useMemo(() => {
-    setLeads(result?.data || []);
-  }, [result?.data]);
+    pagination: { currentPage: 1, pageSize: 25 },
+    sorters: { initial: [{ field: "created_at", order: "desc" }] },
+  });
 
   const handleStatusChange = async (id: number, newStatus: string) => {
     setUpdatingId(id);
@@ -113,11 +107,7 @@ export const RentalLeadList = () => {
       await axiosInstance.patch(`${API_URL}/rental-leads/${id}/status`, {
         status: newStatus,
       });
-      setLeads((prev) =>
-        prev.map((l) =>
-          l.id === id ? { ...l, status: newStatus as RentalLeadRow["status"] } : l,
-        ),
-      );
+      invalidate({ resource: "rental-leads", invalidates: ["list"] });
     } catch (err) {
       console.error("Failed to update status", err);
     } finally {
@@ -333,12 +323,10 @@ export const RentalLeadList = () => {
       </Box>
 
       <DataGrid
-        rows={leads}
+        {...dataGridProps}
         columns={columns}
         autoHeight
         density="comfortable"
-        loading={isLoading}
-        hideFooter
         columnVisibilityModel={{
           created_at: !isMobile,
           comment: !isMobile,

@@ -36,8 +36,8 @@ import {
   Theme,
   Alert,
 } from "@mui/material";
-import { useTranslate, useList, useCustomMutation } from "@refinedev/core";
-import { useQueryClient } from "@tanstack/react-query";
+import { useTranslate, useList, useCustomMutation, useInvalidate } from "@refinedev/core";
+
 import { useForm } from "react-hook-form";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -71,7 +71,6 @@ const FILTER_STATUS = ["all", "paid", "unpaid"];
 
 export const CarDamageList = () => {
   const t = useTranslate();
-  const queryClient = useQueryClient();
   const isMobile = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down("md"),
   );
@@ -83,6 +82,7 @@ export const CarDamageList = () => {
     pageSize: 25,
   });
   const { mutate: markPaid } = useCustomMutation();
+  const invalidate = useInvalidate();
 
   // Синхронизируем фильтры с реальным полем is_paid из базы данных
   const { result, query } = useList({
@@ -117,7 +117,7 @@ export const CarDamageList = () => {
       return;
     try {
       await axiosInstance.delete(`/car-damages/${id}`);
-      queryClient.invalidateQueries({ queryKey: ["default", "car-damages"] });
+      invalidate({ resource: "car-damages", invalidates: ["list"] });
     } catch (e) {
       console.error(e);
     }
@@ -136,9 +136,7 @@ export const CarDamageList = () => {
       },
       {
         onSuccess: () =>
-          queryClient.invalidateQueries({
-            queryKey: ["default", "car-damages"],
-          }),
+          invalidate({ resource: "car-damages", invalidates: ["list"] }),
       },
     );
   };
@@ -434,7 +432,7 @@ const AddDamageDialog = ({
   refetchList,
 }: AddDamageDialogProps) => {
   const t = useTranslate();
-  const queryClient = useQueryClient();
+  const invalidate = useInvalidate();
 
   const [file, setFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
@@ -535,7 +533,7 @@ const AddDamageDialog = ({
       });
 
       await refetchList?.();
-      queryClient.invalidateQueries({ queryKey: ["default", "car-damages"] });
+      invalidate({ resource: "car-damages", invalidates: ["list"] });
       setDamagesVersion((v) => v + 1);
       reset();
       setFile(null);
