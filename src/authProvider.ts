@@ -1,27 +1,36 @@
 import { AuthProvider } from "@refinedev/core";
 import { axiosInstance } from "./utility/axios-instance";
 
+function parseJwt(token: string) {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join(""),
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
+
 export const authProvider: AuthProvider = {
-  // 1. ВХОД
   login: async ({ email, password }) => {
     try {
-      // Стучимся на твой бэкенд
       const { data } = await axiosInstance.post("/auth/login", {
         email,
         password,
       });
 
-      // Сохраняем токен, который вернул NestJS
       if (data.access_token) {
         localStorage.setItem("access_token", data.access_token);
-
-        // (Опционально) Сохраним роль или юзера, если бэкенд отдает
-        // localStorage.setItem("user", JSON.stringify(data.user));
-
-        return {
-          success: true,
-          redirectTo: "/",
-        };
+        if (data.refresh_token) {
+          localStorage.setItem("refresh_token", data.refresh_token);
+        }
+        return { success: true, redirectTo: "/" };
       }
       return {
         success: false,
@@ -38,62 +47,66 @@ export const authProvider: AuthProvider = {
     }
   },
 
-  // 2. ВЫХОД
   logout: async () => {
+    try {
+      await axiosInstance.post("/auth/logout");
+    } catch {
+      // Если токен уже протух — всё равно чистим локально
+    }
     localStorage.removeItem("access_token");
-    return {
-      success: true,
-      redirectTo: "/login",
-    };
+    localStorage.removeItem("refresh_token");
+    return { success: true, redirectTo: "/login" };
   },
 
-  // 3. ПРОВЕРКА ПРИ ЗАГРУЗКЕ (Залогинен ли?)
   check: async () => {
     const token = localStorage.getItem("access_token");
-    if (token) {
-      return { authenticated: true };
+    const refreshToken = localStorage.getItem("refresh_token");
+    if (token) return { authenticated: true };
+    if (refreshToken) {
+      try {
+        const { data } = await axiosInstance.post("/auth/refresh", {
+          refresh_token: refreshToken,
+        });
+        if (data.access_token) {
+          localStorage.setItem("access_token", data.access_token);
+          localStorage.setItem("refresh_token", data.refresh_token);
+          return { authenticated: true };
+        }
+      } catch {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+      }
     }
-    return {
-      authenticated: false,
-      redirectTo: "/login",
-    };
+    return { authenticated: false, redirectTo: "/login" };
   },
 
-  // 4. ПОЛУЧЕНИЕ ПРАВ (Роли)
   getPermissions: async () => {
     const token = localStorage.getItem("access_token");
-    if (token) {
-      // Тут можно декодировать JWT и достать роль
-      // Либо сделать запрос на /auth/profile
-      return ["ADMIN"]; // Пока заглушка
-    }
-    return null;
+    if (!token) return null;
+    const payload = parseJwt(token);
+    const roles: string[] = payload?.roles || [];
+    if (roles.length > 0) return roles;
+    return ["ADMIN"];
   },
 
-  // 5. ПОЛУЧЕНИЕ ПРОФИЛЯ (Для аватарки в углу)
   getIdentity: async () => {
     try {
-      // Если у тебя есть эндпоинт /users/profile или /auth/profile
-      // const { data } = await axiosInstance.get("/users/profile");
-      // return data;
-
-      return {
-        id: 1,
-        name: "Admin User",
-        avatar: "https://i.pravatar.cc/300",
-      };
-    } catch (error) {
-      console.log(error);
-      return null;
+      const { data } = await axiosInstance.get("/users/profile");
+      return data;
+    } catch {
+      const token = localStorage.getItem("access_token");
+      if (!token) return null;
+      const payload = parseJwt(token);
+      if (payload) {
+        return { id: payload.sub, email: payload.email, name: payload.email };
+      }
+      return { id: 1, name: "Admin" };
     }
   },
 
-  // Обработка ошибок
   onError: async (error) => {
     if (error.response?.status === 401) {
-      return {
-        logout: true,
-      };
+      return { logout: true };
     }
     return { error };
   },

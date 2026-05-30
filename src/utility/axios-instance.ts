@@ -1,13 +1,22 @@
 import axios from "axios";
 
-// Адрес твоего бэкенда
 export const API_URL = "http://localhost:3000";
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
 });
 
-// 👇 Перехватчик: перед каждым запросом суем токен в заголовок
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: (value: any) => void; reject: (reason?: any) => void }> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) reject(error);
+    else resolve(token);
+  });
+  failedQueue = [];
+};
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access_token");
@@ -19,14 +28,64 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// 👇 Перехватчик: если токен протух (401), выкидываем юзера
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("access_token");
-      // Можно сделать редирект на логин, но AuthProvider сам это обработает
+  async (error) => {
+    const originalRequest = error.config;
+    const isLoginRequest = originalRequest?.url?.includes("/auth/login");
+    const isRefreshRequest = originalRequest?.url?.includes("/auth/refresh");
+    const isLogoutRequest = originalRequest?.url?.includes("/auth/logout");
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._isRetry &&
+      !isLoginRequest &&
+      !isRefreshRequest &&
+      !isLogoutRequest
+    ) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return axiosInstance(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._isRetry = true;
+      isRefreshing = true;
+
+      const refreshToken = localStorage.getItem("refresh_token");
+      if (!refreshToken) {
+        isRefreshing = false;
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        window.location.href = "/login?session_expired=1";
+        return Promise.reject(error);
+      }
+
+      try {
+        const { data } = await axios.post(`${API_URL}/auth/refresh`, {
+          refresh_token: refreshToken,
+        });
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("refresh_token", data.refresh_token);
+        processQueue(null, data.access_token);
+        originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        window.location.href = "/login?session_expired=1";
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
+
     return Promise.reject(error);
   },
 );
