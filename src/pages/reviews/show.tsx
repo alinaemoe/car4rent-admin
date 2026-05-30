@@ -42,7 +42,7 @@ export const ReviewShow = () => {
         </Avatar>
         <Box textAlign={{ xs: "center", sm: "left" }}>
           <Typography variant="h4" fontWeight="bold">
-            {record.user?.first_name} {record.user?.last_name}
+            {record.user ? `${record.user.first_name} ${record.user.last_name}` : "—"}
           </Typography>
           <Stack
             direction="row"
@@ -114,7 +114,7 @@ export const ReviewShow = () => {
                 {t("reviews.fields.user", "User")}
               </Typography>
               <Typography variant="body1">
-                {record.user?.first_name} {record.user?.last_name}
+                {record.user ? `${record.user.first_name} ${record.user.last_name}` : "—"}
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {record.user?.email || record.user?.id}

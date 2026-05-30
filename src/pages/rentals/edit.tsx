@@ -178,10 +178,10 @@ export const RentalEdit = () => {
                 </Avatar>
                 <Box>
                   <Typography variant="h6">
-                    {record.car?.brand} {record.car?.model}
+                    {record.car ? `${record.car.brand} ${record.car.model}` : "—"}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {record.car?.license_plate} — {t("rentals.fields.idLabel", "Rental")} #{record.id}
+                    {record.car?.license_plate || "—"} — {t("rentals.fields.idLabel", "Rental")} #{record.id}
                   </Typography>
                   <Stack direction="row" spacing={1} mt={0.5}>
                     <Chip

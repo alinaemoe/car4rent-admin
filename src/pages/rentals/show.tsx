@@ -67,18 +67,18 @@ export const RentalShow = () => {
         <Avatar
           src={carImage}
           variant="rounded"
-          alt={`${car?.brand} ${car?.model}`}
-          sx={{ width: 120, height: 80, fontSize: "2rem" }}
+            alt={car ? `${car.brand} ${car.model}` : "Car"}
+            sx={{ width: 120, height: 80, fontSize: "2rem" }}
         >
           <DirectionsCarIcon sx={{ fontSize: 40 }} />
         </Avatar>
 
         <Box textAlign={{ xs: "center", sm: "left" }} flex={1}>
           <Typography variant="h4" fontWeight="bold">
-            {car?.brand} {car?.model}
+            {car ? `${car.brand} ${car.model}` : "—"}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            {car?.license_plate} — {t("rentals.fields.idLabel", "Rental")} #{record.id}
+            {car?.license_plate || "—"} — {t("rentals.fields.idLabel", "Rental")} #{record.id}
           </Typography>
 
           <Stack direction="row" spacing={1} mt={1} justifyContent={{ xs: "center", sm: "flex-start" }} flexWrap="wrap">
@@ -94,7 +94,7 @@ export const RentalShow = () => {
             />
             <Chip
               icon={<PersonIcon />}
-              label={`${user?.first_name} ${user?.last_name}`}
+              label={user ? `${user.first_name} ${user.last_name}` : "—"}
               variant="outlined"
               size="small"
             />
@@ -145,9 +145,9 @@ const DetailsTab = ({ record, t }: { record: any; t: any }) => {
               </Avatar>
               <Box>
                 <Typography variant="body1" fontWeight="bold">
-                  {user?.first_name} {user?.last_name}
+                  {user ? `${user.first_name} ${user.last_name}` : "—"}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">{user?.email}</Typography>
+                <Typography variant="caption" color="text.secondary">{user?.email || "—"}</Typography>
                 {user?.phone && (
                   <Typography variant="caption" display="block" color="text.secondary">{user.phone}</Typography>
                 )}
@@ -163,17 +163,17 @@ const DetailsTab = ({ record, t }: { record: any; t: any }) => {
           <Stack spacing={1}>
             <Stack direction="row" justifyContent="space-between">
               <Typography color="text.secondary">{t("cars.fields.brand", "Brand")}</Typography>
-              <Typography>{car?.brand} {car?.model}</Typography>
+              <Typography>{car ? `${car.brand} ${car.model}` : "—"}</Typography>
             </Stack>
             <Divider />
             <Stack direction="row" justifyContent="space-between">
               <Typography color="text.secondary">{t("cars.fields.plate", "License Plate")}</Typography>
-              <Typography sx={{ fontFamily: "monospace" }}>{car?.license_plate}</Typography>
+              <Typography sx={{ fontFamily: "monospace" }}>{car?.license_plate || "—"}</Typography>
             </Stack>
             <Divider />
             <Stack direction="row" justifyContent="space-between">
               <Typography color="text.secondary">{t("cars.fields.year", "Year")}</Typography>
-              <Typography>{car?.year}</Typography>
+              <Typography>{car?.year || "—"}</Typography>
             </Stack>
           </Stack>
         </Paper>

@@ -74,7 +74,7 @@ export const ReviewEdit = () => {
                   </Avatar>
                   <Box>
                     <Typography variant="body1" fontWeight={600}>
-                      {record.user?.first_name} {record.user?.last_name}
+                      {record.user ? `${record.user.first_name} ${record.user.last_name}` : "—"}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {record.user?.email || record.user?.id}

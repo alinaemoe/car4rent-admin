@@ -80,10 +80,10 @@ export const RentalsTab = ({ userId }: RentalsTabProps) => {
               </Avatar>
               <Box>
                 <Typography variant="body2" fontWeight="bold">
-                  {car?.brand} {car?.model}
+                  {car ? `${car.brand} ${car.model}` : "—"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {car?.year} • {car?.number_plate}
+                  {car ? `${car.year} • ${car.number_plate}` : "—"}
                 </Typography>
               </Box>
             </Stack>

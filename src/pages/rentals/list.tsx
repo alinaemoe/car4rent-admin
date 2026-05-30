@@ -68,10 +68,10 @@ export const RentalList = () => {
               </Avatar>
               <Box>
                 <Typography variant="body2" fontWeight="bold" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 180 }}>
-                  {car?.brand} {car?.model}
+                  {car ? `${car.brand} ${car.model}` : "—"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 180 }}>
-                  {car?.license_plate}
+                  {car?.license_plate || "—"}
                 </Typography>
               </Box>
             </Stack>
@@ -98,10 +98,10 @@ export const RentalList = () => {
               </Avatar>
               <Box>
                 <Typography variant="body2" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160 }}>
-                  {user?.first_name} {user?.last_name}
+                  {user ? `${user.first_name} ${user.last_name}` : "—"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160 }}>
-                  {user?.email}
+                  {user?.email || "—"}
                 </Typography>
               </Box>
             </Stack>

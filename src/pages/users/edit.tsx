@@ -59,10 +59,10 @@ export const UserEdit = () => {
           />
           <Box>
             <Typography variant="h6">
-              {userData?.first_name} {userData?.last_name}
+              {userData ? `${userData.first_name} ${userData.last_name}` : "—"}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              ID: {userData?.id} • {userData?.email}
+              {userData ? `ID: ${userData.id} • ${userData.email}` : "—"}
             </Typography>
           </Box>
         </Stack>

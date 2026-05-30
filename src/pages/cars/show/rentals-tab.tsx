@@ -77,10 +77,10 @@ export const CarRentalsTab = ({ carId }: CarRentalsTabProps) => {
               </Avatar>
               <Box>
                 <Typography variant="body2" fontWeight="bold">
-                  {user?.first_name} {user?.last_name}
+                  {user ? `${user.first_name} ${user.last_name}` : "—"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {user?.email}
+                  {user?.email || "—"}
                 </Typography>
               </Box>
             </Stack>
