@@ -41,7 +41,7 @@ export const RentalList = () => {
         width: 70,
         align: "center",
         headerAlign: "center",
-        renderCell: ({ value }) => <CenteredCell>#{value}</CenteredCell>,
+        renderCell: ({ value }) => <CenteredCell>{value ? `#${value}` : "—"}</CenteredCell>,
       },
 
       // 1. КОЛОНКА: АВТОМОБИЛЬ 🚗
@@ -161,7 +161,7 @@ export const RentalList = () => {
         width: 140,
         renderCell: ({ value }) => (
           <CenteredCell>
-            <DateField value={value} format="L HH:mm" />
+            {value ? <DateField value={value} format="L HH:mm" /> : "—"}
           </CenteredCell>
         ),
       },
@@ -171,7 +171,7 @@ export const RentalList = () => {
         width: 140,
         renderCell: ({ value }) => (
           <CenteredCell>
-            <DateField value={value} format="L HH:mm" />
+            {value ? <DateField value={value} format="L HH:mm" /> : "—"}
           </CenteredCell>
         ),
       },
@@ -185,7 +185,7 @@ export const RentalList = () => {
         headerAlign: "right",
         renderCell: ({ row }) => {
           // Если аренда завершена, показываем total, иначе base
-          const price = row.total_price || row.base_price;
+          const price = row.total_price || row.base_price || 0;
           const hasPenalty = row.penalty_price > 0;
 
           return (

@@ -34,6 +34,7 @@ import {
   Autocomplete,
   useMediaQuery,
   Theme,
+  Alert,
 } from "@mui/material";
 import { useTranslate, useList, useCustomMutation } from "@refinedev/core";
 import { useQueryClient } from "@tanstack/react-query";
@@ -104,6 +105,7 @@ export const CarDamageList = () => {
   const rows = result?.data?.data || [];
   const total = result?.data?.total || 0;
   const isLoading = query?.isLoading;
+  const isError = query?.isError;
   const refetchList = query?.refetch;
 
   const handleDelete = async (id: number) => {
@@ -358,6 +360,11 @@ export const CarDamageList = () => {
         </Stack>
 
         <Box sx={{ height: 600, width: "100%" }}>
+          {isError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {t("messages.loading_error", "Failed to load data")}
+            </Alert>
+          )}
           <DataGrid
             rows={rows}
             columns={columns}
@@ -451,7 +458,7 @@ const AddDamageDialog = ({
 
   const { result: carsResult } = useList({
     resource: "cars",
-    pagination: { currentPage: 1, pageSize: 500 },
+    pagination: { currentPage: 1, pageSize: 50 },
   }) as any;
 
   const cars: CarOption[] = Array.isArray(carsResult?.data)

@@ -8,6 +8,7 @@ import {
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useForm } from "react-hook-form";
 import {
+  Alert,
   Box,
   Avatar,
   Chip,
@@ -64,6 +65,7 @@ export const CarDamagesTab = ({ carId }: DamagesTabProps) => {
   }) as any;
 
   const rows = result?.data?.data || [];
+  const isError = query?.isError;
   const isLoading = query?.isLoading;
 
   // --- HANDLERS ---
@@ -190,6 +192,11 @@ export const CarDamagesTab = ({ carId }: DamagesTabProps) => {
         </Button>
       </Stack>
 
+      {isError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {t("messages.loading_error", "Failed to load data")}
+        </Alert>
+      )}
       <DataGrid
         rows={rows}
         columns={columns}

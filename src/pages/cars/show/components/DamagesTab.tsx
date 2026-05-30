@@ -7,6 +7,7 @@ import {
 } from "@refinedev/core";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  Alert,
   Box,
   Stack,
   Typography,
@@ -96,6 +97,7 @@ export const DamagesTab = ({ carId }: DamagesTabProps) => {
     coord_z: Number(d.coord_z),
   }));
   const isLoading = query?.isLoading;
+  const isError = query?.isError;
 
   const handleCarClick = useCallback(
     (position: { x: number; y: number; z: number }) => {
@@ -252,7 +254,11 @@ export const DamagesTab = ({ carId }: DamagesTabProps) => {
             </Button>
           </Stack>
 
-          {isLoading ? (
+          {isError ? (
+            <Alert severity="error" sx={{ m: 2 }}>
+              {t("messages.loading_error", "Failed to load data")}
+            </Alert>
+          ) : isLoading ? (
             <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
               <CircularProgress size={24} />
             </Box>

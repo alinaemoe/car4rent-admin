@@ -36,6 +36,7 @@ i18n
           },
           messages: {
             no_data: "No data found",
+            loading_error: "Failed to load data",
           },
           common: {
             confirm: {
@@ -730,6 +731,7 @@ i18n
           },
           messages: {
             no_data: "Данные не найдены",
+            loading_error: "Ошибка загрузки данных",
           },
           common: {
             confirm: {
