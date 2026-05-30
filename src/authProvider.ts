@@ -61,7 +61,11 @@ export const authProvider: AuthProvider = {
   check: async () => {
     const token = localStorage.getItem("access_token");
     const refreshToken = localStorage.getItem("refresh_token");
-    if (token) return { authenticated: true };
+    if (token) {
+      if (parseJwt(token)) return { authenticated: true };
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+    }
     if (refreshToken) {
       try {
         const { data } = await axiosInstance.post("/auth/refresh", {

@@ -18,7 +18,7 @@ type IUser = {
   id: number;
   name: string;
   email: string;
-  avatar: string;
+  avatar?: string;
 };
 
 export const Header: React.FC<RefineThemedLayoutHeaderProps> = ({
