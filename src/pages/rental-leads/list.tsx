@@ -129,7 +129,7 @@ export const RentalLeadList = () => {
     () => [
       {
         field: "id",
-        headerName: "ID",
+        headerName: t("table.id", "ID"),
         minWidth: 60,
         flex: 0.3,
         align: "center",

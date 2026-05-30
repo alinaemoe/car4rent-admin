@@ -153,7 +153,7 @@ export const CarDamagesTab = ({ carId }: DamagesTabProps) => {
       renderCell: ({ row }) => (
         <CenteredCell>
           {!row.is_paid && (
-            <Tooltip title="Mark as Paid">
+            <Tooltip title={t("cars.damages.actions.markPaid", "Mark as Paid")}>
               <IconButton
                 color="success"
                 size="small"
@@ -163,7 +163,7 @@ export const CarDamagesTab = ({ carId }: DamagesTabProps) => {
               </IconButton>
             </Tooltip>
           )}
-          <Tooltip title="Delete">
+          <Tooltip title={t("cars.damages.actions.delete", "Delete")}>
             <IconButton
               color="error"
               size="small"

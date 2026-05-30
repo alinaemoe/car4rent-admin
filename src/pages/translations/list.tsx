@@ -70,7 +70,7 @@ const TranslationListInner = () => {
     const baseColumns: GridColDef[] = [
       {
         field: "id",
-        headerName: "ID",
+        headerName: t("table.id", "ID"),
         width: 70,
         renderCell: ({ value }) => <CenteredCell>#{value}</CenteredCell>,
       },

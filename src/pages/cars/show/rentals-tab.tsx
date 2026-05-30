@@ -52,7 +52,7 @@ export const CarRentalsTab = ({ carId }: CarRentalsTabProps) => {
     const baseColumns: GridColDef[] = [
       {
         field: "id",
-        headerName: "ID",
+        headerName: t("table.id", "ID"),
         width: 70,
         align: "center",
         headerAlign: "center",

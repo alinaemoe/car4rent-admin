@@ -45,7 +45,7 @@ export const getTransactionColumns = (
 ): GridColDef<TransactionRow>[] => [
   {
     field: "id",
-    headerName: "ID",
+    headerName: t("table.id", "ID"),
     width: 70,
     align: "center",
     headerAlign: "center",

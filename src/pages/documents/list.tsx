@@ -302,7 +302,7 @@ export const DocumentList = () => {
     () => [
       {
         field: "id",
-        headerName: "ID",
+        headerName: t("table.id", "ID"),
         type: "number",
         minWidth: 60,
         flex: 0.3,

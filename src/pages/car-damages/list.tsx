@@ -145,7 +145,7 @@ export const CarDamageList = () => {
     const baseColumns: GridColDef[] = [
       {
         field: "id",
-        headerName: "ID",
+        headerName: t("table.id", "ID"),
         width: 70,
         renderCell: ({ value }) => <CenteredCell>#{value}</CenteredCell>,
       },
@@ -547,10 +547,16 @@ const AddDamageDialog = ({
     <Dialog
       open={open}
       onClose={isSubmitting ? undefined : onClose}
+      disableEscapeKeyDown={isSubmitting}
       maxWidth="lg"
       fullWidth
       PaperProps={{
         sx: { borderRadius: 2 },
+      }}
+      slotProps={{
+        backdrop: {
+          style: { pointerEvents: isSubmitting ? "none" : "auto" },
+        },
       }}
     >
       <DialogTitle sx={{ m: 0, p: 2, pb: 1 }}>

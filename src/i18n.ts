@@ -31,6 +31,8 @@ i18n
             saving: "Saving...",
             select_files: "Upload files",
             loading: "Loading...",
+            view: "View",
+            logout: "Logout",
           },
           messages: {
             no_data: "No data found",
@@ -91,6 +93,9 @@ i18n
               lastName: "Last Name",
               phone: "Phone",
               adminComment: "Admin Comment",
+              emailVerified: "Email Verified",
+              documentsVerified: "Docs Verified",
+              contacts: "Contacts",
             },
             placeholders: {
               adminComment: "Notes visible only to administrators",
@@ -695,6 +700,10 @@ i18n
               "Failed to refresh session. Please log out and try again.",
             logout: "Logout",
           },
+          table: {
+            id: "ID",
+            actions: "Actions",
+          },
         },
       },
       ru: {
@@ -716,6 +725,8 @@ i18n
             saving: "Сохранение...",
             select_files: "Загрузить файлы",
             loading: "Загрузка...",
+            view: "Просмотр",
+            logout: "Выйти",
           },
           messages: {
             no_data: "Данные не найдены",
@@ -776,6 +787,9 @@ i18n
               lastName: "Фамилия",
               phone: "Телефон",
               adminComment: "Комментарий админа",
+              emailVerified: "Email подтвержден",
+              documentsVerified: "Документы подтверждены",
+              contacts: "Контакты",
             },
             placeholders: {
               adminComment: "Заметки видны только администраторам",
@@ -1379,6 +1393,10 @@ i18n
             session_refresh_failed:
               "Не удалось обновить сессию. Пожалуйста, выйдите и войдите снова.",
             logout: "Выйти",
+          },
+          table: {
+            id: "ID",
+            actions: "Действия",
           },
         },
       },
