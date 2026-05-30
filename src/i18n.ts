@@ -27,6 +27,18 @@ i18n
           },
           buttons: {
             addNewPhotos: "Add New Photos",
+            cancel: "Cancel",
+            saving: "Saving...",
+            select_files: "Upload files",
+            loading: "Loading...",
+          },
+          messages: {
+            no_data: "No data found",
+          },
+          common: {
+            confirm: {
+              delete: "Are you sure?",
+            },
           },
           locations: {
             titles: {
@@ -48,6 +60,7 @@ i18n
               deleteConfirm: "Delete this location?",
             },
           },
+          notAvailable: "N/A",
           notifications: {
             imagesUploaded: "New images uploaded",
             imageDeleted: "Image deleted",
@@ -55,6 +68,7 @@ i18n
             errorDeleting: "Error deleting image",
             documentVerified: "Document verified",
             documentRejected: "Document rejected",
+            markedPaid: "Marked as Paid",
           },
           users: {
             titles: {
@@ -65,10 +79,13 @@ i18n
               avatar: "Avatar",
               email: "Email",
               fullName: "Full Name",
+              name: "Name",
               roles: "Roles",
               status: "Status",
               verified: "Verified",
               createdAt: "Created At",
+              updatedAt: "Updated",
+              systemData: "System Data",
               actions: "Actions",
               firstName: "First Name",
               lastName: "Last Name",
@@ -205,6 +222,49 @@ i18n
               deleteConfirm: "Delete this feature?",
             },
           },
+          partnership_requests: {
+            list: {
+              title: "Partnership Requests",
+            },
+            fields: {
+              id: "ID",
+              car: "Car",
+              year: "Year",
+              owner: "Owner",
+              status: "Status",
+              created_at: "Created",
+            },
+            status: {
+              NEW: "New",
+              APPROVED: "Approved",
+              REJECTED: "Rejected",
+            },
+            show: {
+              title: "Partnership Request",
+              request_id: "Request #",
+              from: "From",
+              car_details: "Car Details",
+              brand_model: "Brand & Model",
+              year: "Year",
+              owner: "Owner",
+              owner_name: "Name",
+              owner_phone: "Phone",
+              user_id: "System User ID",
+              management: "Management",
+              photos: "Owner Photos",
+              photo_alt: "Car photo",
+            },
+            buttons: {
+              approve: "Approve",
+              reject: "Reject",
+              create_car: "Create Car",
+            },
+            messages: {
+              approved_msg: "Request approved. You can now add this car to the catalog.",
+              rejected_msg: "Request was rejected.",
+              no_photos: "No photos uploaded.",
+            },
+          },
           rental_leads: {
             titles: {
               list: "Rental Leads",
@@ -331,6 +391,18 @@ i18n
               localization: "Localization",
               images: "Images",
             },
+            titles: {
+              basic_info: "Basic Information",
+              tech_specs: "Technical Specifications",
+              pricing: "Pricing & Conditions",
+              description: "Description",
+              images: "Images",
+            },
+            tabs: {
+              details: "Details",
+              rentals: "Rentals",
+              damages: "Damages",
+            },
             fields: {
               car: "Car",
               price: "Price / Day",
@@ -345,6 +417,21 @@ i18n
               overLimitPrice: "Over limit ($/km)",
               color: "Color",
               description: "Description",
+              body_type: "Body Type",
+              drive_type: "Drive Type",
+              deposit: "Deposit",
+              insurance: "Insurance",
+              limit: "Mileage Limit (km/day)",
+              overlimit: "Over Limit Fee",
+              min_age: "Min Age",
+              min_exp: "Min Experience (years)",
+              mileage: "Current Mileage (km)",
+              horsepower: "Horsepower",
+              fuel_consumption: "Fuel Consumption (L/100km)",
+              discount_tiers: "Discount Tiers",
+              avg_rating: "Rating",
+              location_name: "Name",
+              location_address: "Address",
               owner: {
                 label: "Owner",
                 placeholder: "Select User",
@@ -359,6 +446,11 @@ i18n
                 label: "Features",
                 placeholder: "Select Features",
               },
+            },
+            messages: {
+              image_deleted: "Image deleted",
+              images_uploaded: "Images uploaded successfully",
+              images_failed: "Failed to upload images",
             },
             enums: {
               transmission: {
@@ -462,10 +554,14 @@ i18n
               idLabel: "Rental",
               car: "Car",
               user: "Driver",
+              driver: "Driver",
               status: "Status",
               startDate: "Start Date",
               endDate: "End Date",
+              start_date: "Start Date",
+              end_date: "End Date",
               price: "Price",
+              dates: "Dates",
             },
             enums: {
               status: {
@@ -607,6 +703,18 @@ i18n
           },
           buttons: {
             addNewPhotos: "Добавить фото",
+            cancel: "Отмена",
+            saving: "Сохранение...",
+            select_files: "Загрузить файлы",
+            loading: "Загрузка...",
+          },
+          messages: {
+            no_data: "Данные не найдены",
+          },
+          common: {
+            confirm: {
+              delete: "Вы уверены?",
+            },
           },
           locations: {
             titles: {
@@ -628,6 +736,7 @@ i18n
               deleteConfirm: "Удалить эту локацию?",
             },
           },
+          notAvailable: "Н/Д",
           notifications: {
             imagesUploaded: "Новые изображения загружены",
             imageDeleted: "Изображение удалено",
@@ -635,6 +744,7 @@ i18n
             errorDeleting: "Ошибка при удалении",
             documentVerified: "Документ подтвержден",
             documentRejected: "Документ отклонен",
+            markedPaid: "Отмечено как оплачено",
           },
           users: {
             titles: {
@@ -645,10 +755,13 @@ i18n
               avatar: "Аватар",
               email: "Email",
               fullName: "ФИО",
+              name: "Имя",
               roles: "Роли",
               status: "Статус",
               verified: "Вериф.",
               createdAt: "Дата создания",
+              updatedAt: "Обновлено",
+              systemData: "Системные данные",
               actions: "Действия",
               firstName: "Имя",
               lastName: "Фамилия",
@@ -785,6 +898,49 @@ i18n
               deleteConfirm: "Удалить эту опцию?",
             },
           },
+          partnership_requests: {
+            list: {
+              title: "Заявки партнёров",
+            },
+            fields: {
+              id: "ID",
+              car: "Автомобиль",
+              year: "Год",
+              owner: "Владелец",
+              status: "Статус",
+              created_at: "Дата заявки",
+            },
+            status: {
+              NEW: "Новая",
+              APPROVED: "Одобрена",
+              REJECTED: "Отклонена",
+            },
+            show: {
+              title: "Просмотр заявки",
+              request_id: "Заявка #",
+              from: "От",
+              car_details: "Детали автомобиля",
+              brand_model: "Марка и модель",
+              year: "Год выпуска",
+              owner: "Владелец",
+              owner_name: "Имя",
+              owner_phone: "Телефон",
+              user_id: "ID пользователя в системе",
+              management: "Управление заявкой",
+              photos: "Фотографии от владельца",
+              photo_alt: "Фото автомобиля",
+            },
+            buttons: {
+              approve: "Одобрить",
+              reject: "Отклонить",
+              create_car: "Создать автомобиль",
+            },
+            messages: {
+              approved_msg: "Заявка одобрена. Теперь вы можете добавить этот автомобиль в каталог.",
+              rejected_msg: "Заявка была отклонена.",
+              no_photos: "Фотографии не были загружены.",
+            },
+          },
           rental_leads: {
             titles: {
               list: "Заявки с лендинга",
@@ -911,6 +1067,18 @@ i18n
               localization: "Локализация",
               images: "Изображения",
             },
+            titles: {
+              basic_info: "Основная информация",
+              tech_specs: "Технические характеристики",
+              pricing: "Цены и условия",
+              description: "Описание",
+              images: "Фотографии",
+            },
+            tabs: {
+              details: "Детали",
+              rentals: "Аренды",
+              damages: "Повреждения",
+            },
             fields: {
               car: "Автомобиль",
               price: "Цена / Сутки",
@@ -925,6 +1093,21 @@ i18n
               overLimitPrice: "Доплата за перелимит ($/км)",
               color: "Цвет",
               description: "Описание",
+              body_type: "Тип кузова",
+              drive_type: "Тип привода",
+              deposit: "Депозит",
+              insurance: "Страховка",
+              limit: "Лимит пробега (км/день)",
+              overlimit: "Доплата за перелимит",
+              min_age: "Мин. возраст",
+              min_exp: "Мин. стаж (лет)",
+              mileage: "Текущий пробег (км)",
+              horsepower: "Лошадиные силы",
+              fuel_consumption: "Расход топлива (Л/100км)",
+              discount_tiers: "Скидки",
+              avg_rating: "Рейтинг",
+              location_name: "Название",
+              location_address: "Адрес",
               owner: {
                 label: "Владелец",
                 placeholder: "Выберите пользователя",
@@ -939,6 +1122,11 @@ i18n
                 label: "Опции",
                 placeholder: "Выберите опции",
               },
+            },
+            messages: {
+              image_deleted: "Изображение удалено",
+              images_uploaded: "Изображения загружены",
+              images_failed: "Ошибка загрузки изображений",
             },
             enums: {
               transmission: {
@@ -1042,10 +1230,14 @@ i18n
               idLabel: "Аренда",
               car: "Автомобиль",
               user: "Водитель",
+              driver: "Водитель",
               status: "Статус",
               startDate: "Начало",
               endDate: "Конец",
+              start_date: "Дата начала",
+              end_date: "Дата окончания",
               price: "Стоимость",
+              dates: "Даты",
             },
             enums: {
               status: {

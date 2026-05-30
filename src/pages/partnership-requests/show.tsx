@@ -158,7 +158,7 @@ export const PartnershipRequestShow = () => {
           </Paper>
 
           {/* БЛОК ДЕЙСТВИЙ */}
-          <Box p={3} bgcolor="#f8f9fa" borderRadius={2}>
+          <Box p={3} bgcolor="action.hover" borderRadius={2}>
             <Typography
               variant="subtitle2"
               gutterBottom
@@ -239,7 +239,7 @@ export const PartnershipRequestShow = () => {
                 <ImageListItem key={index}>
                   <img
                     src={photo}
-                    alt={`Car photo ${index + 1}`}
+                    alt={t("partnership_requests.show.photo_alt", "Car photo") + ` ${index + 1}`}
                     loading="lazy"
                     style={{ borderRadius: 8, cursor: "pointer" }}
                     onClick={() => window.open(photo, "_blank")}
@@ -250,7 +250,7 @@ export const PartnershipRequestShow = () => {
           ) : (
             <Paper
               variant="outlined"
-              sx={{ p: 4, textAlign: "center", bgcolor: "#fafafa" }}
+              sx={{ p: 4, textAlign: "center", bgcolor: "action.hover" }}
             >
               <Typography color="text.secondary">
                 {t(

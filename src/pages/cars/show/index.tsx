@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   useShow,
-  //useTranslate
+  useTranslate,
 } from "@refinedev/core";
 import { Show } from "@refinedev/mui";
 import {
@@ -13,8 +13,6 @@ import {
   Divider,
   Tabs,
   Tab,
-  Grid,
-  Paper,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import CarRentalIcon from "@mui/icons-material/CarRental";
@@ -27,9 +25,10 @@ import {
 } from "../../../components/common/custom-tab-panel";
 import { CarRentalsTab } from "./rentals-tab";
 import { DamagesTab } from "./components/DamagesTab";
+import { CarDetailsTab } from "./components/CarDetailsTab";
 
 export const CarShow = () => {
-  // const t = useTranslate();
+  const t = useTranslate();
   const [activeTab, setActiveTab] = useState(0);
 
   const { query } = useShow() as any;
@@ -105,19 +104,19 @@ export const CarShow = () => {
             variant="scrollable"
           >
             <Tab
-              label="Details"
+              label={t("cars.tabs.details", "Details")}
               icon={<InfoIcon />}
               iconPosition="start"
               {...a11yProps(0)}
             />
             <Tab
-              label="Rentals History"
+              label={t("cars.tabs.rentals", "Rentals History")}
               icon={<CarRentalIcon />}
               iconPosition="start"
               {...a11yProps(1)}
             />
             <Tab
-              label="Damages"
+              label={t("cars.tabs.damages", "Damages")}
               icon={<CarCrashIcon />}
               iconPosition="start"
               {...a11yProps(2)}
@@ -127,30 +126,7 @@ export const CarShow = () => {
 
         {/* 1. DETAILS TAB */}
         <CustomTabPanel value={activeTab} index={0}>
-          <Box mt={2}>
-            <Typography variant="h6" gutterBottom>
-              Info
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Paper variant="outlined" sx={{ p: 2 }}>
-                  <Typography variant="caption" color="text.secondary">
-                    VIN
-                  </Typography>
-                  <Typography>{record.vin}</Typography>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Paper variant="outlined" sx={{ p: 2 }}>
-                  <Typography variant="caption" color="text.secondary">
-                    Mileage
-                  </Typography>
-                  <Typography>{record.current_mileage} km</Typography>
-                </Paper>
-              </Grid>
-              {/* Можно добавить больше инфо: цвет, описание и т.д. */}
-            </Grid>
-          </Box>
+          <CarDetailsTab record={record} />
         </CustomTabPanel>
 
         {/* 2. RENTALS TAB */}

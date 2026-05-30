@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { List, ShowButton } from "@refinedev/mui";
+import { useDataGrid, List, ShowButton } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Chip,
@@ -10,7 +10,7 @@ import {
   Theme,
   Avatar,
 } from "@mui/material";
-import { useTranslate, useList } from "@refinedev/core";
+import { useTranslate } from "@refinedev/core";
 import { DateField } from "@refinedev/mui";
 
 import { CenteredCell } from "../../components/common/centered-cell";
@@ -21,18 +21,9 @@ export const PartnershipRequestList = () => {
     theme.breakpoints.down("md"),
   );
 
-  const { result, isLoading } = useList({
-    resource: "partnership-requests",
-    pagination: { mode: "off" },
-    sorters: [
-      {
-        field: "created_at",
-        order: "desc",
-      },
-    ],
-  }) as any;
-
-  const rows = result?.data || [];
+  const { dataGridProps } = useDataGrid({
+    syncWithLocation: true,
+  });
 
   const columns = useMemo<GridColDef[]>(() => {
     const baseColumns: GridColDef[] = [
@@ -44,12 +35,11 @@ export const PartnershipRequestList = () => {
       },
       {
         field: "car",
-        headerName: t("partnership_requests.fields.car", "Автомобиль"),
-        width: 300, // 👈 Увеличили ширину, как в машинах
+        headerName: t("partnership_requests.fields.car", "Car"),
+        width: 300,
         renderCell: ({ row }) => {
           const image = row.photos?.[0];
           return (
-            // 👇 Тот самый паттерн с height="100%"
             <Stack
               direction="row"
               spacing={2}
@@ -68,7 +58,7 @@ export const PartnershipRequestList = () => {
                   {row.car_brand} {row.car_model}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {t("partnership_requests.fields.year", "Год")}: {row.car_year}
+                  {t("partnership_requests.fields.year", "Year")}: {row.car_year}
                 </Typography>
               </Box>
             </Stack>
@@ -77,7 +67,7 @@ export const PartnershipRequestList = () => {
       },
       {
         field: "owner",
-        headerName: t("partnership_requests.fields.owner", "Владелец"),
+        headerName: t("partnership_requests.fields.owner", "Owner"),
         width: 200,
         renderCell: ({ row }) => (
           <Stack justifyContent="center" height="100%">
@@ -92,7 +82,7 @@ export const PartnershipRequestList = () => {
       },
       {
         field: "status",
-        headerName: t("partnership_requests.fields.status", "Статус"),
+        headerName: t("partnership_requests.fields.status", "Status"),
         width: 140,
         renderCell: ({ value }) => {
           let color: "info" | "success" | "error" | "default" = "default";
@@ -120,7 +110,7 @@ export const PartnershipRequestList = () => {
       },
       {
         field: "created_at",
-        headerName: t("partnership_requests.fields.created_at", "Дата заявки"),
+        headerName: t("partnership_requests.fields.created_at", "Created"),
         width: 160,
         renderCell: ({ value }) => (
           <CenteredCell>
@@ -130,7 +120,7 @@ export const PartnershipRequestList = () => {
       },
       {
         field: "actions",
-        headerName: t("table.actions", "Действия"),
+        headerName: t("table.actions", "Actions"),
         sortable: false,
         width: 120,
         renderCell: ({ row }) => (
@@ -152,29 +142,27 @@ export const PartnershipRequestList = () => {
   }, [t, isMobile]);
 
   return (
-    <List title={t("partnership_requests.list.title", "Заявки Партнеров")}>
-      <Box sx={{ height: 600, width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          hideFooter={true}
-          loading={isLoading}
-          rowHeight={90} // 👈 Обязательно увеличиваем высоту строки, чтобы аватарке было не тесно
-          sx={{
-            border: "none",
-            "& .MuiDataGrid-cell": {
-              borderBottom: "1px solid #f0f0f0",
-              whiteSpace: "normal",
-              lineHeight: "1.3em",
-              py: 1,
-              alignItems: "center",
-              display: "flex",
-              flexDirection: "row",
-            },
-          }}
-          disableRowSelectionOnClick
-        />
-      </Box>
+    <List title={t("partnership_requests.list.title", "Partnership Requests")}>
+      <DataGrid
+        {...dataGridProps}
+        columns={columns}
+        autoHeight
+        density="comfortable"
+        sx={{
+          border: "none",
+          "& .MuiDataGrid-cell": {
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            whiteSpace: "normal",
+            lineHeight: "1.3em",
+            py: 1,
+            alignItems: "center",
+            display: "flex",
+            flexDirection: "row",
+          },
+        }}
+        disableRowSelectionOnClick
+      />
     </List>
   );
 };

@@ -1,5 +1,11 @@
 import React, { useMemo } from "react";
-import { List, EditButton, ShowButton, DeleteButton } from "@refinedev/mui";
+import {
+  useDataGrid,
+  List,
+  EditButton,
+  ShowButton,
+  DeleteButton,
+} from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Avatar,
@@ -10,9 +16,8 @@ import {
   useMediaQuery,
   Theme,
 } from "@mui/material";
-import { useTranslate, useList } from "@refinedev/core";
+import { useTranslate } from "@refinedev/core";
 
-// Твой компонент
 import { CenteredCell } from "../../components/common/centered-cell";
 
 export const CarList = () => {
@@ -21,19 +26,9 @@ export const CarList = () => {
     theme.breakpoints.down("md"),
   );
 
-  // 👇 ТВОЙ ПАТТЕРН: result вместо data
-  const { result, isLoading } = useList({
-    resource: "cars",
-    pagination: { mode: "off" }, // Пока без пагинации, если машин немного
-    sorters: [
-      {
-        field: "created_at",
-        order: "desc",
-      },
-    ],
-  }) as any;
-
-  const rows = result?.data || [];
+  const { dataGridProps } = useDataGrid({
+    syncWithLocation: true,
+  });
 
   const columns = useMemo<GridColDef[]>(() => {
     const baseColumns: GridColDef[] = [
@@ -44,7 +39,7 @@ export const CarList = () => {
         renderCell: ({ value }) => <CenteredCell>#{value}</CenteredCell>,
       },
       {
-        field: "brand", // Объединяем Бренд + Модель + Фото
+        field: "brand",
         headerName: t("cars.fields.car", "Car"),
         width: 300,
         renderCell: ({ row }) => {
@@ -68,7 +63,7 @@ export const CarList = () => {
                   {row.brand} {row.model}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {row.year} • {row.number_plate}
+                  {row.year} • {row.license_plate}
                 </Typography>
               </Box>
             </Stack>
@@ -99,7 +94,7 @@ export const CarList = () => {
           return (
             <CenteredCell>
               <Chip
-                label={value}
+                label={t(`cars.enums.status.${value}`, value)}
                 color={color}
                 size="small"
                 variant={value === "RENTED" ? "outlined" : "filled"}
@@ -117,7 +112,6 @@ export const CarList = () => {
           <CenteredCell spacing={1}>
             <EditButton size="small" hideText recordItemId={row.id} />
             <ShowButton size="small" hideText recordItemId={row.id} />
-            {/* Удаление только если машина свободна (пример логики) */}
             {row.status === "AVAILABLE" && (
               <DeleteButton size="small" hideText recordItemId={row.id} />
             )}
@@ -126,7 +120,6 @@ export const CarList = () => {
       },
     ];
 
-    // Адаптив: на мобилке скрываем ID и Цену, оставляем Главное и Статус
     if (isMobile) {
       return baseColumns.filter(
         (c) => c.field !== "id" && c.field !== "price_per_day",
@@ -138,28 +131,26 @@ export const CarList = () => {
 
   return (
     <List>
-      <Box sx={{ height: 600, width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          hideFooter={true}
-          loading={isLoading}
-          rowHeight={90}
-          sx={{
-            border: "none",
-            "& .MuiDataGrid-cell": {
-              borderBottom: "1px solid #f0f0f0",
-              whiteSpace: "normal",
-              lineHeight: "1.3em",
-              py: 1,
-              alignItems: "center",
-              display: "flex",
-              flexDirection: "row",
-            },
-          }}
-          disableRowSelectionOnClick
-        />
-      </Box>
+      <DataGrid
+        {...dataGridProps}
+        columns={columns}
+        autoHeight
+        density="comfortable"
+        sx={{
+          border: "none",
+          "& .MuiDataGrid-cell": {
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            whiteSpace: "normal",
+            lineHeight: "1.3em",
+            py: 1,
+            alignItems: "center",
+            display: "flex",
+            flexDirection: "row",
+          },
+        }}
+        disableRowSelectionOnClick
+      />
     </List>
   );
 };
