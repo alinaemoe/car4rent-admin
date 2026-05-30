@@ -136,7 +136,7 @@ export const ReviewEdit = () => {
                         field.onChange(newValue ?? 5);
                       }}
                       size="large"
-                      icon={<StarIcon fontSize="inherit" sx={{ color: "#f59e0b" }} />}
+                      icon={<StarIcon fontSize="inherit" sx={{ color: "warning.main" }} />}
                     />
                     <FormHelperText>
                       {field.value ?? record?.rating} / 5

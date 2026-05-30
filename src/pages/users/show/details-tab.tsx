@@ -8,6 +8,7 @@ import {
   Paper,
   Divider,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
@@ -150,11 +151,11 @@ export const DetailsTab = ({ record, t }: { record: any; t: any }) => {
       {record?.admin_comment && (
         <Grid item xs={12}>
           <Paper
-            sx={{
+            sx={(theme) => ({
               p: 2,
-              bgcolor: "warning.lighter",
+              bgcolor: alpha(theme.palette.warning.main, theme.palette.mode === "dark" ? 0.15 : 0.08),
               borderColor: "warning.light",
-            }}
+            })}
             variant="outlined"
           >
             <Typography variant="subtitle2" color="warning.dark" gutterBottom>

@@ -144,7 +144,7 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
                   doc.image_url || "https://placehold.co/600x400?text=No+Image"
                 }
                 alt="Document"
-                sx={{ objectFit: "cover", bgcolor: "#f5f5f5", cursor: "pointer" }}
+                sx={{ objectFit: "cover", bgcolor: "background.default", cursor: "pointer" }}
                 onClick={() => setPreviewDoc(doc)}
               />
 

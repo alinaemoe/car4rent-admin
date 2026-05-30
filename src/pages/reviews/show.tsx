@@ -54,7 +54,7 @@ export const ReviewShow = () => {
               value={record.rating ?? 0}
               readOnly
               precision={0.5}
-              icon={<StarIcon fontSize="inherit" sx={{ color: "#f59e0b" }} />}
+              icon={<StarIcon fontSize="inherit" sx={{ color: "warning.main" }} />}
               emptyIcon={<StarIcon fontSize="inherit" />}
             />
             <Typography variant="body2" color="text.secondary">

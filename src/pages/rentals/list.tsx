@@ -240,7 +240,8 @@ export const RentalList = () => {
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {
-            borderBottom: "1px solid #f0f0f0",
+            borderBottom: "1px solid",
+            borderColor: "divider",
             whiteSpace: "normal",
             lineHeight: "1.3em",
             py: 1,

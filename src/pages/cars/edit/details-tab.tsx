@@ -613,7 +613,7 @@ export const CarDetailsTab: React.FC<DetailsTabProps> = ({
                     width: 28,
                     height: 28,
                     bgcolor: "rgba(0, 0, 0, 0.6)",
-                    color: "#fff",
+                    color: "common.white",
                     "&:hover": { bgcolor: "rgba(0, 0, 0, 0.9)" },
                   }}
                 >
