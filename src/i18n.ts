@@ -490,6 +490,35 @@ i18n
               jsonValid: "Valid JSON",
             },
           },
+          languages: {
+            titles: {
+              list: "Languages",
+              create: "Create Language",
+              edit: "Edit Language",
+            },
+            fields: {
+              code: "Code",
+              name: "Name",
+              icon_url: "Flag Icon",
+              is_active: "Active",
+              actions: "Actions",
+            },
+            sections: {
+              details: "Details",
+              flag: "Flag Icon",
+            },
+            placeholders: {
+              code: "e.g. ru, en, de",
+              name: "e.g. Russian, English",
+              icon_url: "Flag icon URL",
+            },
+            messages: {
+              deleteConfirm: "Delete this language?",
+              uploadFlag: "Upload Flag",
+              uploading: "Uploading...",
+              changeFlag: "Change Flag",
+            },
+          },
         },
       },
       ru: {
@@ -968,6 +997,35 @@ i18n
               jsonMode: "JSON",
               invalidJson: "Неверный JSON",
               jsonValid: "JSON валиден",
+            },
+          },
+          languages: {
+            titles: {
+              list: "Языки",
+              create: "Создать язык",
+              edit: "Редактировать язык",
+            },
+            fields: {
+              code: "Код",
+              name: "Название",
+              icon_url: "Иконка флага",
+              is_active: "Активен",
+              actions: "Действия",
+            },
+            sections: {
+              details: "Детали",
+              flag: "Иконка флага",
+            },
+            placeholders: {
+              code: "например: ru, en, de",
+              name: "например: Русский, English",
+              icon_url: "URL иконки флага",
+            },
+            messages: {
+              deleteConfirm: "Удалить этот язык?",
+              uploadFlag: "Загрузить флаг",
+              uploading: "Загрузка...",
+              changeFlag: "Сменить флаг",
             },
           },
         },

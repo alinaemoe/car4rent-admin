@@ -16,6 +16,7 @@ import {
 import TranslateIcon from "@mui/icons-material/Translate";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 import SettingsIcon from "@mui/icons-material/Settings";
+import LanguageIcon from "@mui/icons-material/Language";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
@@ -177,6 +178,13 @@ const customDataProvider = {
         : [];
       return { data, total: data.length };
     }
+    if (resource === "languages") {
+      const response = await axiosInstance.get(`${API_URL}/languages`);
+      const data = Array.isArray(response.data)
+        ? response.data.map((item: any) => ({ ...item, id: item.code }))
+        : [];
+      return { data, total: data.length };
+    }
     return baseProvider.getList({ resource, ...rest });
   },
   getOne: async ({ resource, id }: any) => {
@@ -187,6 +195,10 @@ const customDataProvider = {
     if (resource === "settings") {
       const response = await axiosInstance.get(`${API_URL}/settings/${id}`);
       return { data: { ...response.data, id: response.data.key } };
+    }
+    if (resource === "languages") {
+      const response = await axiosInstance.get(`${API_URL}/languages/${id}`);
+      return { data: { ...response.data, id: response.data.code } };
     }
     return baseProvider.getOne({ resource, id });
   },
@@ -234,6 +246,9 @@ import { TransactionShow } from "./pages/transactions/show";
 import { SettingList } from "./pages/settings/list";
 import { SettingCreate } from "./pages/settings/create";
 import { SettingEdit } from "./pages/settings/edit";
+import { LanguageList } from "./pages/languages/list";
+import { LanguageCreate } from "./pages/languages/create";
+import { LanguageEdit } from "./pages/languages/edit";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -363,6 +378,13 @@ function App() {
                     create: "/settings/create",
                     edit: "/settings/edit/:id",
                     meta: { canDelete: true, label: "Settings", icon: <SettingsIcon /> },
+                  },
+                  {
+                    name: "languages",
+                    list: "/languages",
+                    create: "/languages/create",
+                    edit: "/languages/edit/:id",
+                    meta: { canDelete: true, label: "Languages", icon: <LanguageIcon /> },
                   },
                   {
                     name: "car-damages",
@@ -495,6 +517,12 @@ function App() {
                       <Route index element={<SettingList />} />
                       <Route path="create" element={<SettingCreate />} />
                       <Route path="edit/:id" element={<SettingEdit />} />
+                    </Route>
+
+                    <Route path="/languages">
+                      <Route index element={<LanguageList />} />
+                      <Route path="create" element={<LanguageCreate />} />
+                      <Route path="edit/:id" element={<LanguageEdit />} />
                     </Route>
 
                     <Route
