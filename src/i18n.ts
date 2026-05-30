@@ -461,6 +461,35 @@ i18n
               finishError: "Failed to finish rental",
             },
           },
+          settings: {
+            titles: {
+              list: "Settings",
+              create: "Create Setting",
+              edit: "Edit Setting",
+            },
+            fields: {
+              key: "Key",
+              value: "Value",
+              description: "Description",
+              actions: "Actions",
+            },
+            sections: {
+              details: "Details",
+            },
+            placeholders: {
+              key: "e.g. support_phone, currency",
+              value: "Setting value (plain text or JSON)",
+              description: "What this setting controls",
+            },
+            messages: {
+              deleteConfirm: "Delete this setting?",
+              jsonFormat: "Format JSON",
+              textMode: "Text",
+              jsonMode: "JSON",
+              invalidJson: "Invalid JSON",
+              jsonValid: "Valid JSON",
+            },
+          },
         },
       },
       ru: {
@@ -910,6 +939,35 @@ i18n
               statusError: "Ошибка обновления статуса",
               rentalFinished: "Аренда завершена",
               finishError: "Ошибка завершения аренды",
+            },
+          },
+          settings: {
+            titles: {
+              list: "Настройки",
+              create: "Создать настройку",
+              edit: "Редактировать настройку",
+            },
+            fields: {
+              key: "Ключ",
+              value: "Значение",
+              description: "Описание",
+              actions: "Действия",
+            },
+            sections: {
+              details: "Детали",
+            },
+            placeholders: {
+              key: "например: support_phone, currency",
+              value: "Значение настройки (текст или JSON)",
+              description: "Что делает эта настройка",
+            },
+            messages: {
+              deleteConfirm: "Удалить эту настройку?",
+              jsonFormat: "Форматировать JSON",
+              textMode: "Текст",
+              jsonMode: "JSON",
+              invalidJson: "Неверный JSON",
+              jsonValid: "JSON валиден",
             },
           },
         },

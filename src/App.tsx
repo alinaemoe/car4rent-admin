@@ -15,6 +15,7 @@ import {
 } from "@refinedev/mui";
 import TranslateIcon from "@mui/icons-material/Translate";
 import HandshakeIcon from "@mui/icons-material/Handshake";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
@@ -169,12 +170,23 @@ const customDataProvider = {
         total: parseInt(response.headers["x-total-count"] || "0", 10),
       };
     }
+    if (resource === "settings") {
+      const response = await axiosInstance.get(`${API_URL}/settings`);
+      const data = Array.isArray(response.data)
+        ? response.data.map((item: any) => ({ ...item, id: item.key }))
+        : [];
+      return { data, total: data.length };
+    }
     return baseProvider.getList({ resource, ...rest });
   },
   getOne: async ({ resource, id }: any) => {
     if (resource === "transactions") {
       const response = await axiosInstance.get(`${API_URL}/transactions/${id}`);
       return { data: response.data };
+    }
+    if (resource === "settings") {
+      const response = await axiosInstance.get(`${API_URL}/settings/${id}`);
+      return { data: { ...response.data, id: response.data.key } };
     }
     return baseProvider.getOne({ resource, id });
   },
@@ -219,6 +231,9 @@ import { ReviewEdit } from "./pages/reviews/edit";
 import { ReviewShow } from "./pages/reviews/show";
 import { TransactionList } from "./pages/transactions/list";
 import { TransactionShow } from "./pages/transactions/show";
+import { SettingList } from "./pages/settings/list";
+import { SettingCreate } from "./pages/settings/create";
+import { SettingEdit } from "./pages/settings/edit";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -341,6 +356,13 @@ function App() {
                     list: "/transactions",
                     show: "/transactions/show/:id",
                     meta: { label: "Transactions" },
+                  },
+                  {
+                    name: "settings",
+                    list: "/settings",
+                    create: "/settings/create",
+                    edit: "/settings/edit/:id",
+                    meta: { canDelete: true, label: "Settings", icon: <SettingsIcon /> },
                   },
                   {
                     name: "car-damages",
@@ -467,6 +489,12 @@ function App() {
                     <Route path="/transactions">
                       <Route index element={<TransactionList />} />
                       <Route path="show/:id" element={<TransactionShow />} />
+                    </Route>
+
+                    <Route path="/settings">
+                      <Route index element={<SettingList />} />
+                      <Route path="create" element={<SettingCreate />} />
+                      <Route path="edit/:id" element={<SettingEdit />} />
                     </Route>
 
                     <Route
