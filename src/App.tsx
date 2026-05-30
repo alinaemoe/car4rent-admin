@@ -171,6 +171,13 @@ const customDataProvider = {
     }
     return baseProvider.getList({ resource, ...rest });
   },
+  getOne: async ({ resource, id }: any) => {
+    if (resource === "transactions") {
+      const response = await axiosInstance.get(`${API_URL}/transactions/${id}`);
+      return { data: response.data };
+    }
+    return baseProvider.getOne({ resource, id });
+  },
 };
 
 import { UserList } from "./pages/users/list";
@@ -211,6 +218,7 @@ import { ReviewCreate } from "./pages/reviews/create";
 import { ReviewEdit } from "./pages/reviews/edit";
 import { ReviewShow } from "./pages/reviews/show";
 import { TransactionList } from "./pages/transactions/list";
+import { TransactionShow } from "./pages/transactions/show";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -331,6 +339,7 @@ function App() {
                   {
                     name: "transactions",
                     list: "/transactions",
+                    show: "/transactions/show/:id",
                     meta: { label: "Transactions" },
                   },
                   {
@@ -457,6 +466,7 @@ function App() {
 
                     <Route path="/transactions">
                       <Route index element={<TransactionList />} />
+                      <Route path="show/:id" element={<TransactionShow />} />
                     </Route>
 
                     <Route
