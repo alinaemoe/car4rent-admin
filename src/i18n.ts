@@ -154,6 +154,7 @@ i18n
                 ADMIN: "Admin",
                 MANAGER: "Manager",
                 CLIENT: "Client",
+                LESSOR: "Lessor",
               },
               status: {
                 ACTIVE: "Active",
@@ -890,6 +891,7 @@ i18n
                 ADMIN: "Админ",
                 MANAGER: "Менеджер",
                 CLIENT: "Клиент",
+                LESSOR: "Арендодатель",
               },
               status: {
                 ACTIVE: "Активен",

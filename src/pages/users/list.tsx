@@ -8,7 +8,16 @@ import {
 } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
-import { Avatar, Chip, Stack, useMediaQuery, Theme } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Chip,
+  Stack,
+  useMediaQuery,
+  Theme,
+  Typography,
+  Tooltip,
+} from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useTranslate } from "@refinedev/core";
@@ -21,30 +30,10 @@ interface UserRow {
   email: string;
   roles: string[];
   status: string;
-  is_email_verified: boolean; // 👈
-  is_documents_verified: boolean; // 👈
+  is_email_verified: boolean;
+  is_documents_verified: boolean;
   created_at: string;
 }
-
-/**
- * Универсальный контейнер
- * Гарантированно центрирует контент в ячейке по X и Y
- */
-const CenteredCell: React.FC<{
-  children: React.ReactNode;
-  spacing?: number;
-}> = ({ children, spacing = 0 }) => (
-  <Stack
-    direction="row"
-    spacing={spacing}
-    justifyContent="center"
-    alignItems="center"
-    width="100%"
-    height="100%"
-  >
-    {children}
-  </Stack>
-);
 
 export const UserList = () => {
   const t = useTranslate();
@@ -59,83 +48,112 @@ export const UserList = () => {
   const columns = useMemo<GridColDef<UserRow>[]>(
     () => [
       {
-        field: "id",
-        headerName: t("users.fields.id"),
-        type: "number",
-        minWidth: 60,
-        flex: 0.4,
-        align: "center",
-        headerAlign: "center",
-      },
-
-      {
         field: "avatar_url",
-        headerName: t("users.fields.avatar"),
+        headerName: t("users.fields.avatar", "Avatar"),
         sortable: false,
         filterable: false,
-        minWidth: 80,
+        width: 80,
         align: "center",
         headerAlign: "center",
         renderCell: ({ value, row }) => (
-          <CenteredCell>
-            <Avatar
-              src={value}
-              alt={row.first_name}
-              sx={{ width: 32, height: 32 }}
-            />
-          </CenteredCell>
+          <Avatar
+            src={value}
+            alt={row.first_name}
+            sx={{
+              width: 40,
+              height: 40,
+              border: "1px solid",
+              borderColor: "divider",
+            }}
+          />
         ),
       },
 
       {
         field: "email",
-        headerName: t("users.fields.email"),
+        headerName: t("users.fields.email", "Email"),
         flex: 1,
-        minWidth: 220,
+        minWidth: 200,
+        renderCell: ({ value }) => (
+          <Tooltip title={value || ""} placement="top-start">
+            <Typography
+              variant="body2"
+              noWrap
+              sx={{ width: "100%", fontWeight: 500 }}
+            >
+              {value}
+            </Typography>
+          </Tooltip>
+        ),
       },
 
       {
         field: "fullName",
-        headerName: t("users.fields.fullName"),
+        headerName: t("users.fields.fullName", "Full Name"),
         flex: 1,
         minWidth: 180,
         valueGetter: (_value, row) =>
-          `${row.first_name || ""} ${row.last_name || ""}`,
+          `${row.first_name || ""} ${row.last_name || ""}`.trim(),
+        renderCell: ({ value }) => (
+          <Tooltip title={value || ""} placement="top-start">
+            <Typography variant="body2" noWrap sx={{ width: "100%" }}>
+              {value || "—"}
+            </Typography>
+          </Tooltip>
+        ),
       },
 
       {
         field: "roles",
-        headerName: t("users.fields.roles"),
+        headerName: t("users.fields.roles", "Roles"),
         minWidth: 160,
         flex: 1,
         sortable: false,
         align: "center",
         headerAlign: "center",
         renderCell: ({ value }) => (
-          <CenteredCell spacing={0.5}>
-            {value?.map((role: string) => (
-              <Chip
-                key={role}
-                label={t(`users.enums.roles.${role}`)}
-                size="small"
-                color={
-                  role === "ADMIN"
-                    ? "error"
-                    : role === "MANAGER"
-                    ? "warning"
-                    : "primary"
-                }
-                variant="outlined"
-              />
-            ))}
-          </CenteredCell>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 0.5,
+              justifyContent: "center",
+              alignItems: "center",
+              py: 1, // Отступы сверху/снизу для многострочных бейджей
+            }}
+          >
+            {value?.length ? (
+              value.map((role: string) => (
+                <Chip
+                  key={role}
+                  label={t(`users.enums.roles.${role}`, role)}
+                  size="small"
+                  color={
+                    role === "ADMIN"
+                      ? "error"
+                      : role === "MANAGER"
+                      ? "warning"
+                      : role === "LESSOR"
+                      ? "info"
+                      : "default"
+                  }
+                  variant="filled"
+                  sx={{ fontWeight: 500, fontSize: "0.7rem" }}
+                />
+              ))
+            ) : (
+              <Typography variant="caption" color="text.secondary">
+                —
+              </Typography>
+            )}
+          </Box>
         ),
       },
 
       {
         field: "status",
-        headerName: t("users.fields.status"),
-        minWidth: 140,
+        headerName: t("users.fields.status", "Status"),
+        minWidth: 130,
         align: "center",
         headerAlign: "center",
         renderCell: ({ value }) => {
@@ -146,13 +164,13 @@ export const UserList = () => {
           if (value === "PENDING_VERIFICATION") color = "warning";
 
           return (
-            <CenteredCell>
-              <Chip
-                label={t(`users.enums.status.${value}`)}
-                color={color}
-                size="small"
-              />
-            </CenteredCell>
+            <Chip
+              label={t(`users.enums.status.${value}`, value)}
+              color={color}
+              size="small"
+              variant="outlined"
+              sx={{ fontWeight: "bold" }}
+            />
           );
         },
       },
@@ -160,62 +178,84 @@ export const UserList = () => {
       {
         field: "is_email_verified",
         headerName: t("users.fields.emailVerified", "Email Ver."),
-        minWidth: 100,
+        width: 100,
         type: "boolean",
         align: "center",
         headerAlign: "center",
         renderCell: ({ value }) => (
-          <CenteredCell>
+          <Tooltip
+            title={
+              value
+                ? t("users.tooltips.emailVerified", "Email is verified")
+                : t("users.tooltips.emailNotVerified", "Email is not verified")
+            }
+          >
             {value ? (
               <CheckCircleIcon color="success" fontSize="small" />
             ) : (
               <CancelIcon color="disabled" fontSize="small" />
             )}
-          </CenteredCell>
+          </Tooltip>
         ),
       },
 
       {
         field: "is_documents_verified",
         headerName: t("users.fields.documentsVerified", "Docs Ver."),
-        minWidth: 100,
+        width: 100,
         type: "boolean",
         align: "center",
         headerAlign: "center",
         renderCell: ({ value }) => (
-          <CenteredCell>
+          <Tooltip
+            title={
+              value
+                ? t("users.tooltips.docsVerified", "Documents are verified")
+                : t(
+                    "users.tooltips.docsNotVerified",
+                    "Documents are not verified",
+                  )
+            }
+          >
             {value ? (
               <CheckCircleIcon color="success" fontSize="small" />
             ) : (
               <CancelIcon color="disabled" fontSize="small" />
             )}
-          </CenteredCell>
+          </Tooltip>
         ),
       },
 
       {
         field: "created_at",
-        headerName: t("users.fields.createdAt"),
-        minWidth: 180,
+        headerName: t("users.fields.createdAt", "Created At"),
+        minWidth: 160,
+        align: "center",
+        headerAlign: "center",
         renderCell: ({ value }) => (
-          <CenteredCell>
+          <Typography variant="body2" color="text.secondary">
             <DateField value={value} format="LLL" />
-          </CenteredCell>
+          </Typography>
         ),
       },
 
       {
         field: "actions",
-        headerName: t("users.fields.actions"),
+        headerName: t("users.fields.actions", "Actions"),
         sortable: false,
-        minWidth: 120,
+        width: 110,
         align: "center",
         headerAlign: "center",
         renderCell: ({ row }) => (
-          <CenteredCell spacing={1}>
+          <Stack
+            direction="row"
+            spacing={0.5}
+            justifyContent="center"
+            width="100%"
+          >
             <EditButton size="small" hideText recordItemId={row.id} />
             <ShowButton size="small" hideText recordItemId={row.id} />
-          </CenteredCell>
+          </Stack>
         ),
       },
     ],
@@ -231,10 +271,27 @@ export const UserList = () => {
         density="comfortable"
         pageSizeOptions={[10, 25, 50, 100]}
         slots={{ noRowsOverlay: CustomNoRowsOverlay }}
+        getRowHeight={() => "auto"} // Позволяет строкам растягиваться по контенту (для ролей)
         columnVisibilityModel={{
-          id: !isMobile,
           created_at: !isMobile,
-          roles: !isMobile,
+          is_email_verified: !isMobile,
+          is_documents_verified: !isMobile,
+        }}
+        sx={{
+          border: "none",
+          "& .MuiDataGrid-cell": {
+            display: "flex", // Включаем флексбокс для ячеек
+            alignItems: "center", // Идеальное выравнивание по вертикали
+            py: 1, // Базовый отступ сверху/снизу
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "background.paper",
+            borderBottom: "1px solid",
+            borderColor: "divider",
+          },
+          "& .MuiDataGrid-row:hover": {
+            backgroundColor: "action.hover",
+          },
         }}
       />
     </List>
