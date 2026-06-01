@@ -186,7 +186,12 @@ const customDataProvider = {
         : [];
       return { data, total: data.length };
     }
-    return baseProvider.getList({ resource, ...rest });
+    const fallbackResult = await baseProvider.getList({ resource, ...rest });
+    return {
+      ...fallbackResult,
+      data: Array.isArray(fallbackResult.data) ? fallbackResult.data : [],
+      total: Array.isArray(fallbackResult.data) ? (fallbackResult.total ?? fallbackResult.data.length) : 0,
+    };
   },
   getOne: async ({ resource, id }: any) => {
     if (resource === "transactions") {
