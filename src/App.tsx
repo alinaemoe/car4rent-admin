@@ -11,10 +11,22 @@ import {
   ThemedLayout,
   AuthPage,
 } from "@refinedev/mui";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import PeopleIcon from "@mui/icons-material/People";
+import DescriptionIcon from "@mui/icons-material/Description";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import StarIcon from "@mui/icons-material/Star";
+import CampaignIcon from "@mui/icons-material/Campaign";
+import QuizIcon from "@mui/icons-material/Quiz";
+import TuneIcon from "@mui/icons-material/Tune";
+import MapIcon from "@mui/icons-material/Map";
 import TranslateIcon from "@mui/icons-material/Translate";
-import HandshakeIcon from "@mui/icons-material/Handshake";
-import SettingsIcon from "@mui/icons-material/Settings";
 import LanguageIcon from "@mui/icons-material/Language";
+import HandshakeIcon from "@mui/icons-material/Handshake";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
@@ -285,6 +297,7 @@ import { SettingEdit } from "./pages/settings/edit";
 import { LanguageList } from "./pages/languages/list";
 import { LanguageCreate } from "./pages/languages/create";
 import { LanguageEdit } from "./pages/languages/edit";
+import { Dashboard } from "./pages/dashboard";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -311,12 +324,12 @@ function App() {
                 authProvider={authProvider}
                 resources={[
                   {
-                    name: "users",
-                    list: "/users",
-                    create: "/users/create",
-                    edit: "/users/edit/:id",
-                    show: "/users/show/:id",
-                    meta: { canDelete: false },
+                    name: "cars",
+                    list: "/cars",
+                    create: "/cars/create",
+                    edit: "/cars/edit/:id",
+                    show: "/cars/show/:id",
+                    meta: { icon: <DirectionsCarIcon /> },
                   },
                   {
                     name: "rentals",
@@ -324,75 +337,25 @@ function App() {
                     show: "/rentals/show/:id",
                     create: "/rentals/create",
                     edit: "/rentals/edit/:id",
-                  },
-                  {
-                    name: "documents",
-                    list: "/documents",
-                    // show, edit, create пока не нужны, мы управляем ими из UserShow
-                  },
-                  {
-                    name: "cars",
-                    list: "/cars",
-                    create: "/cars/create",
-                    edit: "/cars/edit/:id",
-                    show: "/cars/show/:id",
-                    meta: {
-                      label: "Cars",
-                      // icon: <DirectionsCarIcon /> // Можно добавить иконку, если импортируешь
-                    },
-                  },
-                  {
-                    name: "partnership-requests",
-                    list: "/partnership-requests",
-                    show: "/partnership-requests/show/:id",
-                    meta: {
-                      label: "Partner Requests",
-                      icon: <HandshakeIcon />,
-                    },
-                  },
-                  {
-                    name: "translations",
-                    list: "/translations",
-                    create: "/translations/create",
-                    edit: "/translations/edit/:id",
-                    meta: {
-                      canDelete: true,
-                      icon: <TranslateIcon />,
-                    },
-                  },
-                  {
-                    name: "faq",
-                    list: "/faq",
-                    create: "/faq/create",
-                    edit: "/faq/edit/:id",
-                    meta: { canDelete: true },
-                  },
-                  {
-                    name: "news",
-                    list: "/news",
-                    create: "/news/create",
-                    edit: "/news/edit/:id",
-                    show: "/news/show/:id",
-                    meta: { canDelete: true },
-                  },
-                  {
-                    name: "locations",
-                    list: "/locations",
-                    create: "/locations/create",
-                    edit: "/locations/edit/:id",
-                    meta: { canDelete: true },
-                  },
-                  {
-                    name: "features",
-                    list: "/features",
-                    create: "/features/create",
-                    edit: "/features/edit/:id",
-                    meta: { canDelete: true },
+                    meta: { icon: <ReceiptLongIcon /> },
                   },
                   {
                     name: "rental-leads",
                     list: "/rental-leads",
-                    meta: { label: "Rental Leads" },
+                    meta: { icon: <AssignmentIcon /> },
+                  },
+                  {
+                    name: "users",
+                    list: "/users",
+                    create: "/users/create",
+                    edit: "/users/edit/:id",
+                    show: "/users/show/:id",
+                    meta: { canDelete: false, icon: <PeopleIcon /> },
+                  },
+                  {
+                    name: "documents",
+                    list: "/documents",
+                    meta: { icon: <DescriptionIcon /> },
                   },
                   {
                     name: "reviews",
@@ -400,40 +363,74 @@ function App() {
                     create: "/reviews/create",
                     edit: "/reviews/edit/:id",
                     show: "/reviews/show/:id",
-                    meta: { canDelete: true },
+                    meta: { canDelete: true, icon: <StarIcon /> },
                   },
                   {
-                    name: "transactions",
-                    list: "/transactions",
-                    show: "/transactions/show/:id",
-                    meta: { label: "Transactions" },
+                    name: "news",
+                    list: "/news",
+                    create: "/news/create",
+                    edit: "/news/edit/:id",
+                    show: "/news/show/:id",
+                    meta: { canDelete: true, icon: <CampaignIcon /> },
                   },
                   {
-                    name: "settings",
-                    list: "/settings",
-                    create: "/settings/create",
-                    edit: "/settings/edit/:id",
-                    meta: {
-                      canDelete: true,
-                      label: "Settings",
-                      icon: <SettingsIcon />,
-                    },
+                    name: "faq",
+                    list: "/faq",
+                    create: "/faq/create",
+                    edit: "/faq/edit/:id",
+                    meta: { canDelete: true, icon: <QuizIcon /> },
+                  },
+                  {
+                    name: "features",
+                    list: "/features",
+                    create: "/features/create",
+                    edit: "/features/edit/:id",
+                    meta: { canDelete: true, icon: <TuneIcon /> },
+                  },
+                  {
+                    name: "locations",
+                    list: "/locations",
+                    create: "/locations/create",
+                    edit: "/locations/edit/:id",
+                    meta: { canDelete: true, icon: <MapIcon /> },
+                  },
+                  {
+                    name: "translations",
+                    list: "/translations",
+                    create: "/translations/create",
+                    edit: "/translations/edit/:id",
+                    meta: { canDelete: true, icon: <TranslateIcon /> },
                   },
                   {
                     name: "languages",
                     list: "/languages",
                     create: "/languages/create",
                     edit: "/languages/edit/:id",
-                    meta: {
-                      canDelete: true,
-                      label: "Languages",
-                      icon: <LanguageIcon />,
-                    },
+                    meta: { canDelete: true, icon: <LanguageIcon /> },
+                  },
+                  {
+                    name: "partnership-requests",
+                    list: "/partnership-requests",
+                    show: "/partnership-requests/show/:id",
+                    meta: { icon: <HandshakeIcon /> },
                   },
                   {
                     name: "car-damages",
                     list: "/car-damages",
-                    meta: { label: "Car Damages" },
+                    meta: { icon: <ReportProblemIcon /> },
+                  },
+                  {
+                    name: "transactions",
+                    list: "/transactions",
+                    show: "/transactions/show/:id",
+                    meta: { icon: <PaymentsIcon /> },
+                  },
+                  {
+                    name: "settings",
+                    list: "/settings",
+                    create: "/settings/create",
+                    edit: "/settings/edit/:id",
+                    meta: { canDelete: true, icon: <SettingsIcon /> },
                   },
                 ]}
                 options={{
@@ -592,10 +589,7 @@ function App() {
                       <Route index element={<CarDamageList />} />
                     </Route>
 
-                    <Route
-                      index
-                      element={<NavigateToResource resource="users" />}
-                    />
+                    <Route index element={<Dashboard />} />
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
                 </Routes>

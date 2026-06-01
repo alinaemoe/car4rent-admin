@@ -38,12 +38,18 @@ i18n
             no_data: "No data found",
             loading_error: "Failed to load data",
           },
+          dashboard: { title: "Dashboard" },
+          "car-damages": { "car-damages": "Car Damages" },
+          translations: { translations: "Translations" },
+          "partnership-requests": { "partnership-requests": "Partner Requests" },
+          "rental-leads": { "rental-leads": "Rental Leads" },
           common: {
             confirm: {
               delete: "Are you sure?",
             },
           },
           locations: {
+            locations: "Locations",
             titles: {
               list: "Locations",
               create: "Create Location",
@@ -74,6 +80,7 @@ i18n
             markedPaid: "Marked as Paid",
           },
           users: {
+            users: "Users",
             titles: {
               list: "Users",
             },
@@ -132,6 +139,7 @@ i18n
             },
           },
           documents: {
+            documents: "Documents",
             titles: {
               list: "Documents",
             },
@@ -159,6 +167,7 @@ i18n
             },
           },
           faq: {
+            faq: "FAQ",
             titles: {
               list: "FAQ",
               create: "Create FAQ",
@@ -180,6 +189,7 @@ i18n
             },
           },
           news: {
+            news: "News",
             titles: {
               list: "News",
               create: "Create News",
@@ -209,6 +219,7 @@ i18n
             uploadImage: "Upload Image",
           },
           features: {
+            features: "Features",
             titles: {
               list: "Features",
               create: "Create Feature",
@@ -294,6 +305,7 @@ i18n
             hint: "Click the status to change, or use the action buttons",
           },
           reviews: {
+            reviews: "Reviews",
             titles: {
               list: "Reviews",
               create: "Create Review",
@@ -321,6 +333,7 @@ i18n
             ratingOutOf: "5",
           },
           transactions: {
+            transactions: "Transactions",
             titles: {
               list: "Transactions",
               dashboard: "Analytics Dashboard",
@@ -390,6 +403,7 @@ i18n
             },
           },
           cars: {
+            cars: "Cars",
             sections: {
               basicInfo: "Basic Info",
               pricing: "Identification & Pricing",
@@ -549,6 +563,7 @@ i18n
             },
           },
           rentals: {
+            rentals: "Rentals",
             titles: {
               list: "Rentals",
               create: "New Rental",
@@ -635,6 +650,7 @@ i18n
             },
           },
           settings: {
+            settings: "Settings",
             titles: {
               list: "Settings",
               create: "Create Setting",
@@ -664,6 +680,7 @@ i18n
             },
           },
           languages: {
+            languages: "Languages",
             titles: {
               list: "Languages",
               create: "Create Language",
@@ -733,12 +750,18 @@ i18n
             no_data: "Данные не найдены",
             loading_error: "Ошибка загрузки данных",
           },
+          dashboard: { title: "Дашборд" },
+          "car-damages": { "car-damages": "Повреждения" },
+          translations: { translations: "Переводы" },
+          "partnership-requests": { "partnership-requests": "Заявки партнёров" },
+          "rental-leads": { "rental-leads": "Заявки на аренду" },
           common: {
             confirm: {
               delete: "Вы уверены?",
             },
           },
           locations: {
+            locations: "Локации",
             titles: {
               list: "Локации",
               create: "Создать локацию",
@@ -769,6 +792,7 @@ i18n
             markedPaid: "Отмечено как оплачено",
           },
           users: {
+            users: "Пользователи",
             titles: {
               list: "Пользователи",
             },
@@ -827,6 +851,7 @@ i18n
             },
           },
           documents: {
+            documents: "Документы",
             titles: {
               list: "Документы",
             },
@@ -854,6 +879,7 @@ i18n
             },
           },
           faq: {
+            faq: "FAQ",
             titles: {
               list: "FAQ",
               create: "Создать FAQ",
@@ -875,6 +901,7 @@ i18n
             },
           },
           news: {
+            news: "Новости",
             titles: {
               list: "Новости",
               create: "Создать новость",
@@ -904,6 +931,7 @@ i18n
             uploadImage: "Загрузить изображение",
           },
           features: {
+            features: "Опции",
             titles: {
               list: "Опции",
               create: "Создать опцию",
@@ -989,6 +1017,7 @@ i18n
             hint: "Нажмите на статус чтобы изменить, или используйте кнопки действий",
           },
           reviews: {
+            reviews: "Отзывы",
             titles: {
               list: "Отзывы",
               create: "Создать отзыв",
@@ -1016,6 +1045,7 @@ i18n
             ratingOutOf: "5",
           },
           transactions: {
+            transactions: "Транзакции",
             titles: {
               list: "Транзакции",
               dashboard: "Аналитика",
@@ -1085,6 +1115,7 @@ i18n
             },
           },
           cars: {
+            cars: "Автомобили",
             sections: {
               basicInfo: "Основная информация",
               pricing: "Идентификация и цена",
@@ -1244,6 +1275,7 @@ i18n
             },
           },
           rentals: {
+            rentals: "Аренды",
             titles: {
               list: "Аренды",
               create: "Новая аренда",
@@ -1330,6 +1362,7 @@ i18n
             },
           },
           settings: {
+            settings: "Настройки",
             titles: {
               list: "Настройки",
               create: "Создать настройку",
@@ -1359,6 +1392,7 @@ i18n
             },
           },
           languages: {
+            languages: "Языки",
             titles: {
               list: "Языки",
               create: "Создать язык",
