@@ -90,7 +90,7 @@ export const DamagesTab = ({ carId }: DamagesTabProps) => {
     filters: [{ field: "carId", operator: "eq", value: carId }],
   }) as any;
 
-  const rows: any[] = (result?.data?.data || []).map((d: any) => ({
+  const rows: any[] = (result?.data || []).map((d: any) => ({
     ...d,
     coord_x: Number(d.coord_x),
     coord_y: Number(d.coord_y),

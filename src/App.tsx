@@ -48,12 +48,14 @@ const customDataProvider = {
     }
     if (resource === "rental-leads") {
       const { pagination, sorters } = rest;
-      const _start = pagination?.currentPage && pagination?.pageSize
-        ? (pagination.currentPage - 1) * pagination.pageSize
-        : 0;
-      const _end = pagination?.currentPage && pagination?.pageSize
-        ? pagination.currentPage * pagination.pageSize
-        : 50;
+      const _start =
+        pagination?.currentPage && pagination?.pageSize
+          ? (pagination.currentPage - 1) * pagination.pageSize
+          : 0;
+      const _end =
+        pagination?.currentPage && pagination?.pageSize
+          ? pagination.currentPage * pagination.pageSize
+          : 50;
       const _sort = sorters?.[0]?.field || "created_at";
       const _order = sorters?.[0]?.order || "desc";
       const response = await axiosInstance.get(
@@ -67,17 +69,22 @@ const customDataProvider = {
     }
     if (resource === "features") {
       const { pagination, sorters } = rest;
-      const _start = pagination?.currentPage && pagination?.pageSize
-        ? (pagination.currentPage - 1) * pagination.pageSize
-        : 0;
-      const _end = pagination?.currentPage && pagination?.pageSize
-        ? pagination.currentPage * pagination.pageSize
-        : 50;
+      const _start =
+        pagination?.currentPage && pagination?.pageSize
+          ? (pagination.currentPage - 1) * pagination.pageSize
+          : 0;
+      const _end =
+        pagination?.currentPage && pagination?.pageSize
+          ? pagination.currentPage * pagination.pageSize
+          : 50;
       const _sort = sorters?.[0]?.field || "internal_name";
       const _order = sorters?.[0]?.order || "asc";
-      const response = await axiosInstance.get(`${API_URL}/features/admin/all`, {
-        params: { _start, _end, _sort, _order },
-      });
+      const response = await axiosInstance.get(
+        `${API_URL}/features/admin/all`,
+        {
+          params: { _start, _end, _sort, _order },
+        },
+      );
       return {
         data: Array.isArray(response.data) ? response.data : [],
         total: parseInt(response.headers["x-total-count"] || "0", 10),
@@ -85,30 +92,37 @@ const customDataProvider = {
     }
     if (resource === "locations") {
       const { pagination, sorters } = rest;
-      const _start = pagination?.currentPage && pagination?.pageSize
-        ? (pagination.currentPage - 1) * pagination.pageSize
-        : 0;
-      const _end = pagination?.currentPage && pagination?.pageSize
-        ? pagination.currentPage * pagination.pageSize
-        : 50;
+      const _start =
+        pagination?.currentPage && pagination?.pageSize
+          ? (pagination.currentPage - 1) * pagination.pageSize
+          : 0;
+      const _end =
+        pagination?.currentPage && pagination?.pageSize
+          ? pagination.currentPage * pagination.pageSize
+          : 50;
       const _sort = sorters?.[0]?.field || "name";
       const _order = sorters?.[0]?.order || "asc";
-      const response = await axiosInstance.get(`${API_URL}/locations/admin/all`, {
-        params: { _start, _end, _sort, _order },
-      });
+      const response = await axiosInstance.get(
+        `${API_URL}/locations/admin/all`,
+        {
+          params: { _start, _end, _sort, _order },
+        },
+      );
       return {
         data: Array.isArray(response.data) ? response.data : [],
         total: parseInt(response.headers["x-total-count"] || "0", 10),
       };
     }
     if (resource === "news") {
-      const { pagination, sorters, filters } = rest;
-      const _start = pagination?.currentPage && pagination?.pageSize
-        ? (pagination.currentPage - 1) * pagination.pageSize
-        : 0;
-      const _end = pagination?.currentPage && pagination?.pageSize
-        ? pagination.currentPage * pagination.pageSize
-        : 10;
+      const { pagination, sorters } = rest;
+      const _start =
+        pagination?.currentPage && pagination?.pageSize
+          ? (pagination.currentPage - 1) * pagination.pageSize
+          : 0;
+      const _end =
+        pagination?.currentPage && pagination?.pageSize
+          ? pagination.currentPage * pagination.pageSize
+          : 10;
       const _sort = sorters?.[0]?.field || "created_at";
       const _order = sorters?.[0]?.order || "desc";
       const response = await axiosInstance.get(`${API_URL}/news/admin/all`, {
@@ -121,12 +135,14 @@ const customDataProvider = {
     }
     if (resource === "reviews") {
       const { pagination, sorters, filters } = rest;
-      const _start = pagination?.currentPage && pagination?.pageSize
-        ? (pagination.currentPage - 1) * pagination.pageSize
-        : 0;
-      const _end = pagination?.currentPage && pagination?.pageSize
-        ? pagination.currentPage * pagination.pageSize
-        : 10;
+      const _start =
+        pagination?.currentPage && pagination?.pageSize
+          ? (pagination.currentPage - 1) * pagination.pageSize
+          : 0;
+      const _end =
+        pagination?.currentPage && pagination?.pageSize
+          ? pagination.currentPage * pagination.pageSize
+          : 10;
       const _sort = sorters?.[0]?.field || "created_at";
       const _order = sorters?.[0]?.order || "desc";
       const params: Record<string, any> = { _start, _end, _sort, _order };
@@ -145,28 +161,37 @@ const customDataProvider = {
     }
     if (resource === "transactions") {
       const { pagination, sorters, filters } = rest;
-      const _start = pagination?.currentPage && pagination?.pageSize
-        ? (pagination.currentPage - 1) * pagination.pageSize
-        : 0;
-      const _end = pagination?.currentPage && pagination?.pageSize
-        ? pagination.currentPage * pagination.pageSize
-        : 25;
+      const _start =
+        pagination?.currentPage && pagination?.pageSize
+          ? (pagination.currentPage - 1) * pagination.pageSize
+          : 0;
+      const _end =
+        pagination?.currentPage && pagination?.pageSize
+          ? pagination.currentPage * pagination.pageSize
+          : 25;
       const _sort = sorters?.[0]?.field || "created_at";
       const _order = sorters?.[0]?.order || "desc";
       const params: Record<string, any> = { _start, _end, _sort, _order };
       if (filters) {
-        const payoutFilter = filters.find((f: any) => f.field === "payout_status");
+        const payoutFilter = filters.find(
+          (f: any) => f.field === "payout_status",
+        );
         if (payoutFilter?.value) params.payout_status = payoutFilter.value;
         const typeFilter = filters.find((f: any) => f.field === "type");
         if (typeFilter?.value) params.type = typeFilter.value;
-        const fromDateFilter = filters.find((f: any) => f.field === "from_date");
+        const fromDateFilter = filters.find(
+          (f: any) => f.field === "from_date",
+        );
         if (fromDateFilter?.value) params.from_date = fromDateFilter.value;
         const toDateFilter = filters.find((f: any) => f.field === "to_date");
         if (toDateFilter?.value) params.to_date = toDateFilter.value;
       }
-      const response = await axiosInstance.get(`${API_URL}/transactions/admin/all`, {
-        params,
-      });
+      const response = await axiosInstance.get(
+        `${API_URL}/transactions/admin/all`,
+        {
+          params,
+        },
+      );
       return {
         data: Array.isArray(response.data) ? response.data : [],
         total: parseInt(response.headers["x-total-count"] || "0", 10),
@@ -186,11 +211,15 @@ const customDataProvider = {
         : [];
       return { data, total: data.length };
     }
-    const fallbackResult = await baseProvider.getList({ resource, ...rest });
+    const fallbackResult = (await baseProvider.getList({
+      resource,
+      ...rest,
+    })) as any;
+    const body = fallbackResult.data;
+    const records = Array.isArray(body) ? body : body?.data ?? [];
     return {
-      ...fallbackResult,
-      data: Array.isArray(fallbackResult.data) ? fallbackResult.data : [],
-      total: Array.isArray(fallbackResult.data) ? (fallbackResult.total ?? fallbackResult.data.length) : 0,
+      data: Array.isArray(records) ? records : [],
+      total: body?.total ?? fallbackResult.total ?? records.length,
     };
   },
   getOne: async ({ resource, id }: any) => {
@@ -384,14 +413,22 @@ function App() {
                     list: "/settings",
                     create: "/settings/create",
                     edit: "/settings/edit/:id",
-                    meta: { canDelete: true, label: "Settings", icon: <SettingsIcon /> },
+                    meta: {
+                      canDelete: true,
+                      label: "Settings",
+                      icon: <SettingsIcon />,
+                    },
                   },
                   {
                     name: "languages",
                     list: "/languages",
                     create: "/languages/create",
                     edit: "/languages/edit/:id",
-                    meta: { canDelete: true, label: "Languages", icon: <LanguageIcon /> },
+                    meta: {
+                      canDelete: true,
+                      label: "Languages",
+                      icon: <LanguageIcon />,
+                    },
                   },
                   {
                     name: "car-damages",

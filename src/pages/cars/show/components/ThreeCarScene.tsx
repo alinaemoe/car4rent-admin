@@ -487,19 +487,30 @@ function SceneContent({
       <ProceduralCarModel onClick={onCarClick} />
 
       {/* Existing damage pins */}
-      {(Array.isArray(damages) ? damages : []).map(
-        (d) =>
-          d.coord_x != null &&
-          d.coord_y != null &&
-          d.coord_z != null && (
-            <DamagePin
-              key={d.id}
-              damage={d}
-              isSelected={selectedDamageId === d.id}
-              onClick={onPinClick}
-            />
-          ),
-      )}
+      {(Array.isArray(damages) ? damages : [])
+        .map((d) => ({
+          ...d,
+          coord_x: Number(d.coord_x),
+          coord_y: Number(d.coord_y),
+          coord_z: Number(d.coord_z),
+        }))
+        .filter(
+          (d) =>
+            d.coord_x != null &&
+            d.coord_y != null &&
+            d.coord_z != null &&
+            !isNaN(d.coord_x) &&
+            !isNaN(d.coord_y) &&
+            !isNaN(d.coord_z),
+        )
+        .map((d) => (
+          <DamagePin
+            key={d.id}
+            damage={d}
+            isSelected={selectedDamageId === d.id}
+            onClick={onPinClick}
+          />
+        ))}
 
       {/* Ghost preview pin — visible while dialog is open with captured coords */}
       {previewCoords && <GhostPin position={previewCoords} />}

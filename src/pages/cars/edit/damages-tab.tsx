@@ -64,7 +64,7 @@ export const CarDamagesTab = ({ carId }: DamagesTabProps) => {
     filters: [{ field: "carId", operator: "eq", value: carId }],
   }) as any;
 
-  const rows = result?.data?.data || [];
+  const rows = result?.data || [];
   const isError = query?.isError;
   const isLoading = query?.isLoading;
 

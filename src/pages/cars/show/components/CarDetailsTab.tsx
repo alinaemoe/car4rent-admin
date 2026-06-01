@@ -469,8 +469,8 @@ export const CarDetailsTab = ({ record }: CarDetailsTabProps) => {
             icon={<LocalOfferIcon />}
           >
             <Stack direction="row" flexWrap="wrap" gap={1}>
-              {record.features.map((f: string, idx: number) => (
-                <Chip key={idx} label={f} variant="outlined" size="small" />
+              {record.features.map((f: any, idx: number) => (
+                <Chip key={idx} label={f.internal_name ?? f} variant="outlined" size="small" />
               ))}
             </Stack>
           </SectionCard>

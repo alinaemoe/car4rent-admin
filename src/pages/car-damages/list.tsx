@@ -102,8 +102,8 @@ export const CarDamageList = () => {
     sorters: [{ field: "created_at", order: "desc" }],
   }) as any;
 
-  const rows = result?.data?.data || [];
-  const total = result?.data?.total || 0;
+  const rows = result?.data || [];
+  const total = result?.total || 0;
   const isLoading = query?.isLoading;
   const isError = query?.isError;
   const refetchList = query?.refetch;
