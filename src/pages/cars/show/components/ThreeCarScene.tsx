@@ -7,8 +7,10 @@ import {
   Stack,
   CircularProgress,
   Typography,
+  IconButton,
   useTheme,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { useTranslate } from "@refinedev/core";
 
 interface DamagePoint {
@@ -29,6 +31,12 @@ interface ThreeCarSceneProps {
   onPinClick: (damageId: number) => void;
   onSceneReady: () => void;
   previewCoords?: { x: number; y: number; z: number } | null;
+  onPinDragEnd?: (
+    damageId: number,
+    position: { x: number; y: number; z: number },
+  ) => void;
+  repositionModeLabel?: string | null;
+  onCancelReposition?: () => void;
 }
 
 const BODY_COLOR = "#4a90d9";
@@ -275,20 +283,54 @@ function DamagePin({
   damage,
   isSelected,
   onClick,
+  onDragEnd,
 }: {
   damage: DamagePoint;
   isSelected: boolean;
   onClick: (id: number) => void;
+  onDragEnd?: (id: number, pos: { x: number; y: number; z: number }) => void;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const lineRef = useRef<any>(null);
   const [hovered, setHovered] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const dragPosRef = useRef(new THREE.Vector3(damage.coord_x, damage.coord_y, damage.coord_z));
+  const dragPlaneRef = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0)));
 
   const tooltipTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const color = damage.is_paid ? "#4caf50" : isSelected ? "#ff6b35" : "#f44336";
+
+  const stemPoints: [number, number, number][] = [
+    [damage.coord_x, damage.coord_y + 0.02, damage.coord_z],
+    [damage.coord_x, damage.coord_y + 0.22, damage.coord_z],
+  ];
+
   useFrame((state) => {
     if (meshRef.current) {
-      if (isSelected || hovered) {
+      if (dragging) {
+        const { pointer, camera, raycaster } = state;
+        raycaster.setFromCamera(pointer, camera);
+        const plane = dragPlaneRef.current;
+        plane.set(new THREE.Vector3(0, 1, 0), -damage.coord_y);
+        const point = new THREE.Vector3();
+        if (raycaster.ray.intersectPlane(plane, point)) {
+          point.x = Math.max(-1.5, Math.min(1.5, point.x));
+          point.z = Math.max(-2.5, Math.min(2.5, point.z));
+          point.y = damage.coord_y;
+          dragPosRef.current.copy(point);
+
+          meshRef.current.position.set(point.x, point.y + 0.22, point.z);
+
+          if (lineRef.current) {
+            const pos = lineRef.current.geometry.attributes.position.array;
+            pos[0] = point.x; pos[1] = point.y + 0.02; pos[2] = point.z;
+            pos[3] = point.x; pos[4] = point.y + 0.22; pos[5] = point.z;
+            lineRef.current.geometry.attributes.position.needsUpdate = true;
+          }
+        }
+      } else if (isSelected || hovered) {
         const scale = 1 + 0.3 * Math.sin(state.clock.elapsedTime * 3);
         meshRef.current.scale.setScalar(scale);
       } else {
@@ -296,8 +338,6 @@ function DamagePin({
       }
     }
   });
-
-  const color = damage.is_paid ? "#4caf50" : isSelected ? "#ff6b35" : "#f44336";
 
   const handlePointerOver = useCallback(() => {
     setHovered(true);
@@ -307,8 +347,10 @@ function DamagePin({
 
   const handlePointerOut = useCallback(() => {
     setHovered(false);
-    tooltipTimeoutRef.current = setTimeout(() => setShowTooltip(false), 200);
-  }, []);
+    if (!dragging) {
+      tooltipTimeoutRef.current = setTimeout(() => setShowTooltip(false), 200);
+    }
+  }, [dragging]);
 
   useEffect(() => {
     return () => {
@@ -316,31 +358,51 @@ function DamagePin({
     };
   }, []);
 
-  const handleClick = useCallback(
-    (e: ThreeEvent<MouseEvent>) => {
+  const handlePointerDown = useCallback(
+    (e: ThreeEvent<PointerEvent>) => {
       e.stopPropagation();
-      onClick(damage.id);
+      if (onDragEnd) {
+        setDragging(true);
+        setShowTooltip(false);
+        dragPosRef.current.set(damage.coord_x, damage.coord_y, damage.coord_z);
+        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      } else {
+        onClick(damage.id);
+      }
     },
-    [damage.id, onClick],
+    [damage.id, damage.coord_x, damage.coord_y, damage.coord_z, onClick, onDragEnd],
+  );
+
+  const handlePointerUp = useCallback(
+    (e: ThreeEvent<PointerEvent>) => {
+      if (dragging) {
+        setDragging(false);
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+        const pos = dragPosRef.current;
+        const dx = pos.x - damage.coord_x;
+        const dz = pos.z - damage.coord_z;
+        const moved = Math.sqrt(dx * dx + dz * dz);
+        if (moved > 0.03) {
+          onDragEnd?.(damage.id, { x: pos.x, y: pos.y, z: pos.z });
+        } else {
+          onClick(damage.id);
+        }
+      }
+    },
+    [dragging, damage.id, onDragEnd, onClick, damage.coord_x, damage.coord_y, damage.coord_z],
   );
 
   return (
     <group>
       {/* Vertical stem */}
-      <Line
-        points={[
-          [damage.coord_x, damage.coord_y + 0.02, damage.coord_z],
-          [damage.coord_x, damage.coord_y + 0.2, damage.coord_z],
-        ]}
-        color={color}
-        lineWidth={1}
-      />
+      <Line ref={lineRef} points={stemPoints} color={color} lineWidth={1} />
 
       {/* Glowing pin sphere */}
       <mesh
         ref={meshRef}
         position={[damage.coord_x, damage.coord_y + 0.22, damage.coord_z]}
-        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
         castShadow
@@ -355,8 +417,38 @@ function DamagePin({
         />
       </mesh>
 
+      {/* Drag coordinate indicator */}
+      {dragging && (
+        <Html
+          position={[dragPosRef.current.x, dragPosRef.current.y + 0.45, dragPosRef.current.z]}
+          center
+          style={{ pointerEvents: "none", zIndex: 10 }}
+        >
+          <Box
+            sx={{
+              bgcolor: "primary.main",
+              color: "primary.contrastText",
+              px: 1,
+              py: 0.25,
+              borderRadius: 1,
+              boxShadow: 2,
+              whiteSpace: "nowrap",
+              fontSize: "0.65rem",
+              fontFamily: "monospace",
+            }}
+          >
+            {"X: " +
+              dragPosRef.current.x.toFixed(3) +
+              " Y: " +
+              dragPosRef.current.y.toFixed(3) +
+              " Z: " +
+              dragPosRef.current.z.toFixed(3)}
+          </Box>
+        </Html>
+      )}
+
       {/* Hover tooltip */}
-      {(hovered || isSelected) && showTooltip && (
+      {!dragging && (hovered || isSelected) && showTooltip && (
         <Html
           position={[damage.coord_x, damage.coord_y + 0.5, damage.coord_z]}
           center
@@ -446,15 +538,21 @@ function SceneContent({
   selectedDamageId,
   onCarClick,
   onPinClick,
+  onPinDragEnd,
   onSceneReady,
   previewCoords,
+  repositionModeLabel,
+  onCancelReposition,
 }: {
   damages: DamagePoint[];
   selectedDamageId: number | null;
   onCarClick: (pos: { x: number; y: number; z: number }) => void;
   onPinClick: (id: number) => void;
+  onPinDragEnd?: (id: number, pos: { x: number; y: number; z: number }) => void;
   onSceneReady: () => void;
   previewCoords?: { x: number; y: number; z: number } | null;
+  repositionModeLabel?: string | null;
+  onCancelReposition?: () => void;
 }) {
   useEffect(() => {
     onSceneReady();
@@ -509,6 +607,7 @@ function SceneContent({
             damage={d}
             isSelected={selectedDamageId === d.id}
             onClick={onPinClick}
+            onDragEnd={onPinDragEnd}
           />
         ))}
 
@@ -530,6 +629,47 @@ function SceneContent({
         maxDistance={10}
         target={[0, 0.5, 0]}
       />
+
+      {/* Reposition mode banner — floats above the scene */}
+      {repositionModeLabel && (
+        <Html center position={[0, 2.2, 0]}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{
+              bgcolor: "primary.main",
+              color: "primary.contrastText",
+              px: 2,
+              py: 0.5,
+              borderRadius: 2,
+              boxShadow: 6,
+              whiteSpace: "nowrap",
+              fontSize: "0.85rem",
+              fontWeight: "bold",
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{ color: "inherit", fontWeight: "bold" }}
+            >
+              {repositionModeLabel}
+            </Typography>
+            {onCancelReposition && (
+              <IconButton
+                size="small"
+                sx={{ color: "inherit", ml: 1 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCancelReposition();
+                }}
+              >
+                <CloseIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            )}
+          </Stack>
+        </Html>
+      )}
     </>
   );
 }
@@ -553,8 +693,11 @@ export default function ThreeCarScene({
   selectedDamageId,
   onCarClick,
   onPinClick,
+  onPinDragEnd,
   onSceneReady,
   previewCoords,
+  repositionModeLabel,
+  onCancelReposition,
 }: ThreeCarSceneProps) {
   const theme = useTheme();
   const canvasBgColor = theme.palette.background.default;
@@ -586,8 +729,11 @@ export default function ThreeCarScene({
             selectedDamageId={selectedDamageId}
             onCarClick={onCarClick}
             onPinClick={onPinClick}
+            onPinDragEnd={onPinDragEnd}
             onSceneReady={onSceneReady}
             previewCoords={previewCoords}
+            repositionModeLabel={repositionModeLabel}
+            onCancelReposition={onCancelReposition}
           />
         </React.Suspense>
       </Canvas>

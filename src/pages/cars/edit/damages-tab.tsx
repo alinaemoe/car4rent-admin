@@ -1,50 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, lazy, Suspense } from "react";
 import {
   useList,
   useTranslate,
   useInvalidate,
   useCustomMutation,
 } from "@refinedev/core";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Alert,
   Box,
-  Avatar,
-  Chip,
-  Button,
   Stack,
-  IconButton,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Typography,
-  InputAdornment,
+  Button,
+  Chip,
+  Paper,
+  CircularProgress,
+  Grid,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import BuildIcon from "@mui/icons-material/Build";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { API_URL, axiosInstance } from "../../../utility/axios-instance";
-import { CenteredCell } from "../../../components/common/centered-cell";
-import { CustomNoRowsOverlay } from "../../../components/common/custom-no-rows-overlay";
+import AddLocationIcon from "@mui/icons-material/AddLocation";
+import ThreeDRotationIcon from "@mui/icons-material/ThreeDRotation";
 
-const DAMAGE_TYPES = [
-  { value: "SCRATCH", label: "Scratch" },
-  { value: "DENT", label: "Dent" },
-  { value: "CRACK", label: "Crack" },
-  { value: "BROKEN_PART", label: "Broken Part" },
-  { value: "SALON", label: "Interior/Salon" },
-  { value: "WHEEL", label: "Wheel" },
-  { value: "OTHER", label: "Other" },
-];
+import { API_URL, axiosInstance } from "../../../utility/axios-instance";
+import { DamageListItem } from "./components/damage-list-item";
+import { DamageEditDialog } from "./components/damage-edit-dialog";
+import { AddDamageDialog } from "./components/damage-add-dialog";
+
+const ThreeCarScene = lazy(() => import("../show/components/ThreeCarScene"));
 
 interface DamagesTabProps {
   carId: number;
@@ -54,26 +36,100 @@ export const CarDamagesTab = ({ carId }: DamagesTabProps) => {
   const t = useTranslate();
   const invalidate = useInvalidate();
   const { mutate: markPaid } = useCustomMutation();
+  const queryClient = useQueryClient();
 
-  // Состояние модального окна
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDamageId, setSelectedDamageId] = useState<number | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingDamage, setEditingDamage] = useState<any>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [capturedCoords, setCapturedCoords] = useState<{
+    x: number;
+    y: number;
+    z: number;
+  } | null>(null);
+  const [is3DReady, setIs3DReady] = useState(false);
+  const [viewMode, setViewMode] = useState<"split" | "list">("split");
+  const [damagesVersion, setDamagesVersion] = useState(0);
+  const [repositionDamageId, setRepositionDamageId] = useState<number | null>(null);
 
-  // --- DATA FETCHING ---
+  const handleDamageSaved = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["default", "car-damages"] });
+    invalidate({
+      resource: "car-damages",
+      invalidates: ["list", "resourceAll"],
+    });
+    setDamagesVersion((v) => v + 1);
+  }, [queryClient, invalidate]);
+
   const { result, query } = useList({
     resource: "car-damages",
     filters: [{ field: "carId", operator: "eq", value: carId }],
   }) as any;
 
-  const rows = result?.data || [];
-  const isError = query?.isError;
+  const rows: any[] = (result?.data || []).map((d: any) => ({
+    ...d,
+    coord_x: Number(d.coord_x),
+    coord_y: Number(d.coord_y),
+    coord_z: Number(d.coord_z),
+  }));
   const isLoading = query?.isLoading;
+  const isError = query?.isError;
 
-  // --- HANDLERS ---
+  const handleCarClick = useCallback(
+    (position: { x: number; y: number; z: number }) => {
+      if (repositionDamageId !== null) {
+        setCapturedCoords(position);
+        const dmg = rows.find((d: any) => d.id === repositionDamageId);
+        if (dmg) {
+          setEditingDamage({ ...dmg, ...position });
+          setIsEditModalOpen(true);
+        }
+        setRepositionDamageId(null);
+      } else {
+        setCapturedCoords(position);
+        setEditingDamage(null);
+        setIsCreateModalOpen(true);
+      }
+    },
+    [repositionDamageId, rows],
+  );
+
+  const handlePinClick = useCallback((damageId: number) => {
+    setSelectedDamageId((prev) => (prev === damageId ? null : damageId));
+    setRepositionDamageId((prev) => (prev === damageId ? prev : null));
+  }, []);
+
+  const handleStartReposition = useCallback((damage: any) => {
+    setRepositionDamageId(damage.id);
+    setSelectedDamageId(damage.id);
+    setCapturedCoords(null);
+    setIsEditModalOpen(false);
+    setViewMode("split");
+  }, []);
+
+  const handleSelectForEdit = useCallback((damage: any) => {
+    setRepositionDamageId(null);
+    setEditingDamage(damage);
+    setCapturedCoords(
+      damage.coord_x != null && damage.coord_y != null && damage.coord_z != null
+        ? { x: damage.coord_x, y: damage.coord_y, z: damage.coord_z }
+        : null,
+    );
+    setIsEditModalOpen(true);
+  }, []);
+
   const handleDelete = async (id: number) => {
-    if (!window.confirm(t("common.confirm.delete", "Are you sure?"))) return;
+    if (
+      !window.confirm(
+        t("cars.damages.messages.deleteConfirm", "Confirm delete?"),
+      )
+    )
+      return;
     try {
       await axiosInstance.delete(`/car-damages/${id}`);
       invalidate({ resource: "car-damages", invalidates: ["list"] });
+      if (selectedDamageId === id) setSelectedDamageId(null);
+      if (editingDamage?.id === id) setEditingDamage(null);
     } catch (e) {
       console.error(e);
     }
@@ -86,7 +142,7 @@ export const CarDamagesTab = ({ carId }: DamagesTabProps) => {
         method: "patch",
         values: {},
         successNotification: () => ({
-          message: t("notifications.markedPaid", "Marked as Paid"),
+          message: t("cars.damages.messages.paid", "Marked as paid"),
           type: "success",
         }),
       },
@@ -97,289 +153,222 @@ export const CarDamagesTab = ({ carId }: DamagesTabProps) => {
     );
   };
 
-  // --- COLUMNS ---
-  const columns: GridColDef[] = [
-    {
-      field: "image_url",
-      headerName: t("cars.damages.fields.photo", "Photo"),
-      width: 80,
-      renderCell: ({ value }) => (
-        <CenteredCell>
-          <Avatar src={value} variant="rounded" sx={{ width: 50, height: 50 }}>
-            <BuildIcon />
-          </Avatar>
-        </CenteredCell>
-      ),
-    },
-    {
-      field: "type",
-      headerName: t("cars.damages.fields.type", "Type"),
-      width: 120,
-      renderCell: ({ value }) => (
-        <CenteredCell>
-          {DAMAGE_TYPES.find((d) => d.value === value)?.label || value}
-        </CenteredCell>
-      ),
-    },
-    {
-      field: "description",
-      headerName: t("cars.damages.fields.description", "Description"),
-      flex: 1,
-    },
-    {
-      field: "repair_cost",
-      headerName: t("cars.damages.fields.cost", "Cost"),
-      width: 100,
-      renderCell: ({ value }) => <CenteredCell>${value}</CenteredCell>,
-    },
-    {
-      field: "is_paid",
-      headerName: t("cars.damages.fields.status", "Status"),
-      width: 120,
-      renderCell: ({ row }) => (
-        <CenteredCell>
-          <Chip
-            label={row.is_paid ? "Paid" : "Unpaid"}
-            color={row.is_paid ? "success" : "error"}
-            size="small"
-            variant={row.is_paid ? "filled" : "outlined"}
-          />
-        </CenteredCell>
-      ),
-    },
-    {
-      field: "actions",
-      headerName: t("table.actions", "Actions"),
-      width: 120,
-      sortable: false,
-      renderCell: ({ row }) => (
-        <CenteredCell>
-          {!row.is_paid && (
-            <Tooltip title={t("cars.damages.actions.markPaid", "Mark as Paid")}>
-              <IconButton
-                color="success"
-                size="small"
-                onClick={() => handlePay(row.id)}
-              >
-                <CheckCircleIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-          <Tooltip title={t("cars.damages.actions.delete", "Delete")}>
-            <IconButton
-              color="error"
-              size="small"
-              onClick={() => handleDelete(row.id)}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </CenteredCell>
-      ),
-    },
-  ];
+  const repositionLabel =
+    repositionDamageId !== null
+      ? t(
+          "cars.damages.messages.repositionHint",
+          "Click on the car to set new position",
+        )
+      : null;
 
   return (
-    <Box sx={{ mt: 2, height: 400, width: "100%" }}>
-      <Stack direction="row" justifyContent="flex-end" mb={2}>
-        <Button
-          variant="contained"
-          startIcon={<BuildIcon />}
-          size="small"
-          onClick={() => setIsModalOpen(true)} // Открываем модалку
-        >
-          {t("cars.damages.actions.add", "Add Damage")}
-        </Button>
+    <Box sx={{ mt: 2 }}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+        flexWrap="wrap"
+        gap={1}
+      >
+        <Stack direction="row" spacing={1}>
+          <Chip
+            label={t("cars.damages.tabs.visual3d", "3D Visual")}
+            icon={<ThreeDRotationIcon />}
+            color={viewMode === "split" ? "primary" : "default"}
+            variant={viewMode === "split" ? "filled" : "outlined"}
+            size="small"
+            onClick={() => {
+              setViewMode("split");
+              setRepositionDamageId(null);
+            }}
+          />
+          <Chip
+            label={t("cars.damages.tabs.list", "List")}
+            icon={<BuildIcon />}
+            color={viewMode === "list" ? "primary" : "default"}
+            variant={viewMode === "list" ? "filled" : "outlined"}
+            size="small"
+            onClick={() => {
+              setViewMode("list");
+              setRepositionDamageId(null);
+            }}
+          />
+        </Stack>
+        <Typography variant="caption" color="text.secondary">
+          {rows.length} {rows.length === 1 ? "damage" : "damages"}
+          {!is3DReady && viewMode === "split" && (
+            <CircularProgress size={12} sx={{ ml: 1 }} />
+          )}
+        </Typography>
       </Stack>
 
-      {isError && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {t("messages.loading_error", "Failed to load data")}
-        </Alert>
-      )}
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        rowHeight={70}
-        hideFooter
-        loading={isLoading}
-        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
-        sx={{ border: "none" }}
-      />
-
-      {/* 👇 ВСТАВЛЯЕМ МОДАЛКУ СЮДА */}
-      <AddDamageDialog
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        carId={carId}
-      />
-    </Box>
-  );
-};
-
-// ==========================================
-// SUB-COMPONENT: ADD DAMAGE DIALOG
-// ==========================================
-
-interface AddDamageDialogProps {
-  open: boolean;
-  onClose: () => void;
-  carId: number;
-}
-
-const AddDamageDialog = ({ open, onClose, carId }: AddDamageDialogProps) => {
-  const t = useTranslate();
-  const invalidate = useInvalidate();
-
-  // Используем обычный react-hook-form, так как это изолированная форма
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      type: "SCRATCH",
-      description: "",
-      repair_cost: 0,
-    },
-  });
-
-  const [file, setFile] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const onSubmit = async (data: any) => {
-    setIsSubmitting(true);
-    try {
-      let imageUrl = "";
-
-      // 1. Если есть файл, грузим его
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const uploadRes = await axiosInstance.post(
-          "/car-damages/upload",
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          },
-        );
-        imageUrl = uploadRes.data.url;
-      }
-
-      // 2. Создаем запись о повреждении
-      await axiosInstance.post("/car-damages", {
-        carId: carId,
-        type: data.type,
-        description: data.description,
-        repair_cost: Number(data.repair_cost),
-        image_url: imageUrl || undefined,
-      });
-
-      // 3. Успех
-      invalidate({ resource: "car-damages", invalidates: ["list"] });
-      reset();
-      setFile(null);
-      onClose();
-    } catch (error) {
-      console.error("Failed to add damage", error);
-      // Тут можно добавить notification.open({ type: 'error' ... })
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        {t("cars.damages.actions.add", "Add Damage Record")}
-      </DialogTitle>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent>
-          <Stack spacing={2}>
-            {/* Type Select */}
-            <FormControl fullWidth>
-              <InputLabel>Type</InputLabel>
-              <Select
-                defaultValue="SCRATCH"
-                label="Type"
-                {...register("type", { required: true })}
-              >
-                {DAMAGE_TYPES.map((dt) => (
-                  <MenuItem key={dt.value} value={dt.value}>
-                    {dt.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            {/* Description */}
-            <TextField
-              label="Description"
-              multiline
-              rows={3}
-              fullWidth
-              {...register("description", {
-                required: "Description is required",
-              })}
-              error={!!errors.description}
-              helperText={errors.description?.message as string}
-            />
-
-            {/* Cost */}
-            <TextField
-              label="Repair Cost"
-              type="number"
-              fullWidth
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">$</InputAdornment>
-                ),
-              }}
-              {...register("repair_cost", { required: true, min: 0 })}
-            />
-
-            {/* Image Upload */}
-            <Box
+      <Grid container spacing={2}>
+        {viewMode === "split" && (
+          <Grid item xs={12} md={7} lg={8}>
+            <Suspense
+              fallback={
+                <Box
+                  sx={{
+                    height: 400,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              }
+            >
+              <ThreeCarScene
+                key={damagesVersion}
+                damages={rows}
+                selectedDamageId={selectedDamageId}
+                onCarClick={handleCarClick}
+                onPinClick={handlePinClick}
+                onSceneReady={() => setIs3DReady(true)}
+                previewCoords={capturedCoords}
+                repositionModeLabel={repositionLabel}
+                onCancelReposition={() => {
+                  setRepositionDamageId(null);
+                  if (editingDamage) setIsEditModalOpen(true);
+                }}
+              />
+            </Suspense>
+            <Typography
+              variant="caption"
+              color="text.secondary"
               sx={{
-                border: "1px dashed grey",
-                p: 2,
-                borderRadius: 1,
+                display: "block",
+                mt: 1,
                 textAlign: "center",
+                fontStyle: "italic",
               }}
             >
-              <Button
-                component="label"
-                startIcon={<CloudUploadIcon />}
-                size="small"
-              >
-                Upload Photo
-                <input
-                  type="file"
-                  hidden
-                  accept="image/*"
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) setFile(e.target.files[0]);
-                  }}
-                />
-              </Button>
-              {file && (
-                <Typography variant="caption" display="block" mt={1}>
-                  Selected: {file.name}
-                </Typography>
-              )}
-            </Box>
+              {repositionLabel ||
+                t(
+                  "cars.damages.messages.clickOnCar",
+                  "Click on the car to mark damage location",
+                )}
+            </Typography>
+          </Grid>
+        )}
+
+        <Grid
+          item
+          xs={12}
+          md={viewMode === "split" ? 5 : 12}
+          lg={viewMode === "split" ? 4 : 12}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={1}
+          >
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("cars.damages.titles.list", "Damages")}
+            </Typography>
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<AddLocationIcon />}
+              onClick={() => {
+                setCapturedCoords(null);
+                setEditingDamage(null);
+                setRepositionDamageId(null);
+                setIsCreateModalOpen(true);
+              }}
+            >
+              {t("cars.damages.actions.add", "Add")}
+            </Button>
           </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} color="inherit">
-            Cancel
-          </Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save"}
-          </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
+
+          {isError ? (
+            <Alert severity="error" sx={{ m: 2 }}>
+              {t("messages.loading_error", "Failed to load data")}
+            </Alert>
+          ) : isLoading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+              <CircularProgress size={24} />
+            </Box>
+          ) : rows.length === 0 ? (
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 3,
+                textAlign: "center",
+                bgcolor: "background.default",
+              }}
+            >
+              <BuildIcon sx={{ fontSize: 40, color: "text.disabled", mb: 1 }} />
+              <Typography variant="body2" color="text.secondary">
+                {t(
+                  "cars.damages.messages.noDamages",
+                  "No damages recorded yet",
+                )}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.disabled"
+                sx={{ mt: 1, display: "block" }}
+              >
+                {t(
+                  "cars.damages.messages.clickOnCar",
+                  "Click the car in 3D view or use Add button",
+                )}
+              </Typography>
+            </Paper>
+          ) : (
+            <Stack
+              spacing={1}
+              sx={{ maxHeight: 460, overflow: "auto", pr: 0.5 }}
+            >
+              {rows.map((damage: any) => (
+                <DamageListItem
+                  key={damage.id}
+                  damage={damage}
+                  isSelected={selectedDamageId === damage.id}
+                  onSelect={() =>
+                    setSelectedDamageId(
+                      selectedDamageId === damage.id ? null : damage.id,
+                    )
+                  }
+                  onEdit={() => handleSelectForEdit(damage)}
+                  onReposition={() => handleStartReposition(damage)}
+                  onPay={() => handlePay(damage.id)}
+                  onDelete={() => handleDelete(damage.id)}
+                  t={t}
+                />
+              ))}
+            </Stack>
+          )}
+        </Grid>
+      </Grid>
+
+      <DamageEditDialog
+        open={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingDamage(null);
+          setCapturedCoords(null);
+          setRepositionDamageId(null);
+        }}
+        damage={editingDamage}
+        capturedCoords={capturedCoords}
+        onSuccess={handleDamageSaved}
+        onStartReposition={handleStartReposition}
+      />
+      <AddDamageDialog
+        open={isCreateModalOpen}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setCapturedCoords(null);
+        }}
+        carId={carId}
+        capturedCoords={capturedCoords}
+        onSuccess={handleDamageSaved}
+      />
+    </Box>
   );
 };
