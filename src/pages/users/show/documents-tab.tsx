@@ -22,6 +22,7 @@ import {
   DialogActions,
   CircularProgress,
 } from "@mui/material";
+import { useTheme, alpha } from "@mui/material/styles";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -34,12 +35,11 @@ interface DocumentsTabProps {
 
 export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
   const t = useTranslate();
-  const invalidate = useInvalidate(); // Чтобы обновить список после действий
+  const invalidate = useInvalidate();
+  const theme = useTheme();
 
-  // Состояние для предпросмотра документа
   const [previewDoc, setPreviewDoc] = useState<any>(null);
 
-  // Состояние для модалки отказа
   const [rejectDialog, setRejectDialog] = useState<{
     open: boolean;
     docId: number | null;
@@ -49,7 +49,6 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
   });
   const [rejectReason, setRejectReason] = useState("");
 
-  // 1. Получаем список документов
   const { result, isLoading } = useList({
     resource: "documents",
     filters: [
@@ -61,7 +60,6 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
     ],
   }) as any;
 
-  // 2. Хук для кастомных мутаций (Verify / Reject)
   const { mutate: mutateStatus, mutation } = useCustomMutation();
   const isPending = mutation.isPending;
 
@@ -70,7 +68,7 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
       {
         url: `${API_URL}/documents/${id}/verify`,
         method: "patch",
-        values: {}, // Пустое тело
+        values: {},
         successNotification: () => ({
           message: "Документ подтвержден",
           type: "success",
@@ -79,7 +77,7 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
       {
         onSuccess: () => {
           invalidate({ resource: "documents", invalidates: ["list"] });
-          invalidate({ resource: "users", invalidates: ["detail"] }); // Обновить статус юзера (галочку)
+          invalidate({ resource: "users", invalidates: ["detail"] });
         },
       },
     );
@@ -92,7 +90,7 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
       {
         url: `${API_URL}/documents/${rejectDialog.docId}/reject`,
         method: "patch",
-        values: { reason: rejectReason }, // Передаем reason в body
+        values: { reason: rejectReason },
         successNotification: () => ({
           message: "Документ отклонен",
           type: "success",
@@ -131,8 +129,17 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
       <Grid container spacing={3}>
         {documents.map((doc: any) => (
           <Grid item xs={12} sm={6} md={4} key={doc.id}>
-            <Card variant="outlined" sx={{ position: "relative" }}>
-              {/* Статус чипсом поверх картинки */}
+            <Card
+              variant="outlined"
+              sx={{
+                position: "relative",
+                transition: "box-shadow 0.25s, transform 0.25s",
+                "&:hover": {
+                  boxShadow: 4,
+                  transform: "translateY(-2px)",
+                },
+              }}
+            >
               <Box sx={{ position: "absolute", top: 10, right: 10, zIndex: 1 }}>
                 <StatusChip status={doc.status} t={t} />
               </Box>
@@ -144,57 +151,66 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
                   doc.image_url || "https://placehold.co/600x400?text=No+Image"
                 }
                 alt="Document"
-                sx={{ objectFit: "cover", bgcolor: "background.default", cursor: "pointer" }}
+                sx={{
+                  objectFit: "cover",
+                  bgcolor: "background.default",
+                  cursor: "pointer",
+                }}
                 onClick={() => setPreviewDoc(doc)}
               />
 
               <CardContent>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="subtitle1" fontWeight={700} gutterBottom>
                   {t(`documents.type.${doc.type}`)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  № {doc.document_number || "---"}
+                  № {doc.document_number || "—"}
                 </Typography>
 
-                {/* Если отклонен, показываем причину */}
                 {doc.status === "REJECTED" && doc.rejection_reason && (
                   <Box
-                    mt={1}
-                    p={1}
-                    bgcolor="error.lighter"
-                    color="error.main"
-                    borderRadius={1}
+                    mt={1.5}
+                    p={1.5}
+                    sx={{
+                      bgcolor: alpha(theme.palette.error.main, 0.08),
+                      color: "error.main",
+                      borderRadius: 1.5,
+                      border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
+                    }}
                   >
-                    <Typography variant="caption" fontWeight="bold">
+                    <Typography variant="caption" fontWeight={700}>
                       Причина отказа:
                     </Typography>
-                    <Typography variant="body2">
+                    <Typography variant="body2" sx={{ mt: 0.25 }}>
                       {doc.rejection_reason}
                     </Typography>
                   </Box>
                 )}
               </CardContent>
 
-              {/* Кнопки действий только для PENDING */}
               {doc.status === "PENDING" && (
-                <CardActions>
+                <CardActions sx={{ px: 2, pb: 2 }}>
                   <Button
                     size="small"
+                    variant="contained"
                     color="success"
                     startIcon={<CheckCircleIcon />}
                     onClick={() => handleVerify(doc.id)}
                     disabled={isPending}
+                    sx={{ fontWeight: 600 }}
                   >
                     {t("documents.actions.verify")}
                   </Button>
                   <Button
                     size="small"
+                    variant="outlined"
                     color="error"
                     startIcon={<CancelIcon />}
                     onClick={() =>
                       setRejectDialog({ open: true, docId: doc.id })
                     }
                     disabled={isPending}
+                    sx={{ fontWeight: 600 }}
                   >
                     {t("documents.actions.reject")}
                   </Button>
@@ -205,12 +221,13 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
         ))}
       </Grid>
 
-      {/* Диалог отклонения */}
       <Dialog
         open={rejectDialog.open}
         onClose={() => setRejectDialog({ open: false, docId: null })}
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>{t("documents.actions.reject")}</DialogTitle>
+        <DialogTitle fontWeight={700}>{t("documents.actions.reject")}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -218,25 +235,30 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
             label={t("documents.actions.rejectReason")}
             fullWidth
             variant="outlined"
+            multiline
+            minRows={3}
             value={rejectReason}
             onChange={(e) => setRejectReason(e.target.value)}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRejectDialog({ open: false, docId: null })}>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setRejectDialog({ open: false, docId: null })}
+            variant="outlined"
+          >
             Cancel
           </Button>
           <Button
             onClick={handleRejectSubmit}
             color="error"
             variant="contained"
+            disabled={!rejectReason}
           >
             Confirm Reject
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Диалог предпросмотра документа */}
       <DocumentPreviewDialog
         open={!!previewDoc}
         doc={previewDoc}
@@ -255,26 +277,31 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
   );
 };
 
-// Вспомогательный компонент для статуса
-const StatusChip = ({ status, t }: { status: string; t: any }) => {
-  let color: "warning" | "success" | "error" = "warning";
-  let icon = <AccessTimeIcon />;
+const STATUS_CONFIG = {
+  VERIFIED: { color: "success" as const, icon: CheckCircleIcon },
+  REJECTED: { color: "error" as const, icon: CancelIcon },
+  PENDING: { color: "warning" as const, icon: AccessTimeIcon },
+};
 
-  if (status === "VERIFIED") {
-    color = "success";
-    icon = <CheckCircleIcon />;
-  } else if (status === "REJECTED") {
-    color = "error";
-    icon = <CancelIcon />;
-  }
+const StatusChip = ({ status, t }: { status: string; t: any }) => {
+  const theme = useTheme();
+  const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] ?? STATUS_CONFIG.PENDING;
+  const Icon = config.icon;
+  const paletteColor = theme.palette[config.color];
 
   return (
     <Chip
       label={t(`documents.status.${status}`)}
-      color={color}
-      icon={icon}
+      icon={<Icon sx={{ fontSize: 16, color: `${paletteColor.main} !important` }} />}
       size="small"
-      sx={{ bgcolor: "background.paper", fontWeight: "bold" }} // Белый фон для читаемости на фото
+      sx={{
+        fontWeight: 700,
+        fontSize: "0.75rem",
+        bgcolor: alpha(paletteColor.main, 0.85),
+        color: paletteColor.contrastText,
+        backdropFilter: "blur(6px)",
+        border: `1px solid ${alpha(paletteColor.main, 0.4)}`,
+      }}
     />
   );
 };
