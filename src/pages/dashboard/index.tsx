@@ -55,6 +55,10 @@ const ALERT_COLORS: Record<string, string> = {
   unpaidDamages: "error.main",
 };
 
+function docsFilterUrl() {
+  return `/documents?filters[0][field]=status&filters[0][operator]=eq&filters[0][value]=PENDING`;
+}
+
 const PIE_COLORS = [
   "#42a5f5",
   "#7e57c2",
@@ -151,6 +155,7 @@ function AlertBadge({
   value,
   loading,
   color,
+  subtitle,
   onClick,
 }: {
   icon: React.ReactNode;
@@ -158,6 +163,7 @@ function AlertBadge({
   value: number;
   loading?: boolean;
   color: string;
+  subtitle?: string;
   onClick?: () => void;
 }) {
   return (
@@ -180,7 +186,7 @@ function AlertBadge({
       onClick={onClick}
     >
       <Box sx={{ color, display: "flex" }}>{icon}</Box>
-      <Stack sx={{ minWidth: 0 }} spacing={0}>
+      <Stack sx={{ minWidth: 0 }} spacing={0.2}>
         <Typography variant="body2" color="text.secondary" noWrap fontWeight={500}>
           {label}
         </Typography>
@@ -189,6 +195,21 @@ function AlertBadge({
         ) : (
           <Typography variant="h6" fontWeight={700}>
             {value}
+          </Typography>
+        )}
+        {subtitle && (
+          <Typography
+            variant="caption"
+            sx={{
+              color,
+              fontWeight: 600,
+              fontSize: 11,
+              lineHeight: 1.2,
+              opacity: 0.85,
+            }}
+            noWrap
+          >
+            {subtitle}
           </Typography>
         )}
       </Stack>
@@ -312,13 +333,13 @@ export const Dashboard = () => {
       <Grid container spacing={2} sx={{ mb: 4 }}>
         {(
           [
-            ["pendingDocuments", DescriptionIcon, "info.main", "/documents"],
-            ["newLeads", AssignmentIcon, "secondary.main", "/rental-leads"],
-            ["newPartnershipRequests", HandshakeIcon, "#43a047", "/partnership-requests"],
-            ["overdueRentals", WarningAmberIcon, "warning.main", "/rentals"],
-            ["unpaidDamages", ReportProblemIcon, "error.main", "/car-damages"],
+            ["pendingDocuments", DescriptionIcon, "info.main", docsFilterUrl(), "dashboard.awaitingReview"],
+            ["newLeads", AssignmentIcon, "secondary.main", "/rental-leads", "dashboard.newStatus"],
+            ["newPartnershipRequests", HandshakeIcon, "#43a047", "/partnership-requests", "dashboard.newStatus"],
+            ["overdueRentals", WarningAmberIcon, "warning.main", "/rentals", "dashboard.overdueStatus"],
+            ["unpaidDamages", ReportProblemIcon, "error.main", "/car-damages", "dashboard.unpaidStatus"],
           ] as const
-        ).map(([key, Icon, color, path]) => (
+        ).map(([key, Icon, color, path, subtitleKey]) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={key}>
             <AlertBadge
               icon={<Icon />}
@@ -326,6 +347,7 @@ export const Dashboard = () => {
               value={d ? (d.alerts as any)[key] ?? 0 : 0}
               loading={loading}
               color={color}
+              subtitle={t(subtitleKey, "")}
               onClick={() => navigate(path)}
             />
           </Grid>

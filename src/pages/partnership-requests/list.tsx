@@ -12,8 +12,8 @@ import {
 } from "@mui/material";
 import { useTranslate } from "@refinedev/core";
 import { DateField } from "@refinedev/mui";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 
-import { CenteredCell } from "../../components/common/centered-cell";
 import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 
 export const PartnershipRequestList = () => {
@@ -27,17 +27,12 @@ export const PartnershipRequestList = () => {
   });
 
   const columns = useMemo<GridColDef[]>(() => {
-    const baseColumns: GridColDef[] = [
-      {
-        field: "id",
-        headerName: t("partnership_requests.fields.id", "ID"),
-        width: 70,
-        renderCell: ({ value }) => <CenteredCell>#{value}</CenteredCell>,
-      },
+    return [
       {
         field: "car",
         headerName: t("partnership_requests.fields.car", "Car"),
-        width: 300,
+        flex: 1.5,
+        minWidth: 250,
         renderCell: ({ row }) => {
           const image = row.photos?.[0];
           return (
@@ -46,20 +41,39 @@ export const PartnershipRequestList = () => {
               spacing={2}
               alignItems="center"
               height="100%"
+              width="100%"
             >
               <Avatar
                 src={image}
                 variant="rounded"
-                sx={{ width: 60, height: 40 }}
+                sx={{
+                  width: 56,
+                  height: 40,
+                  bgcolor: "action.hover",
+                  color: "text.secondary",
+                  border: "1px solid",
+                  borderColor: "divider",
+                }}
               >
-                🚗
+                {!image && <DirectionsCarIcon />}
               </Avatar>
-              <Box>
-                <Typography variant="body2" fontWeight="bold" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160 }}>
+              <Box sx={{ minWidth: 0, overflow: "hidden" }}>
+                <Typography
+                  variant="body2"
+                  fontWeight="600"
+                  noWrap
+                  sx={{ width: "100%" }}
+                >
                   {row.car_brand} {row.car_model}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160 }}>
-                  {t("partnership_requests.fields.year", "Year")}: {row.car_year}
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  noWrap
+                  sx={{ width: "100%", display: "block" }}
+                >
+                  {t("partnership_requests.fields.year", "Year")}:{" "}
+                  {row.car_year}
                 </Typography>
               </Box>
             </Stack>
@@ -69,13 +83,29 @@ export const PartnershipRequestList = () => {
       {
         field: "owner",
         headerName: t("partnership_requests.fields.owner", "Owner"),
-        width: 200,
+        flex: 1,
+        minWidth: 200,
         renderCell: ({ row }) => (
-          <Stack justifyContent="center" height="100%">
-            <Typography variant="body2" fontWeight="bold" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+          <Stack
+            justifyContent="center"
+            height="100%"
+            width="100%"
+            sx={{ minWidth: 0 }}
+          >
+            <Typography
+              variant="body2"
+              fontWeight="500"
+              noWrap
+              sx={{ width: "100%" }}
+            >
               {row.owner_name}
             </Typography>
-            <Typography variant="caption" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              noWrap
+              sx={{ width: "100%", display: "block" }}
+            >
               {row.owner_phone}
             </Typography>
           </Stack>
@@ -84,7 +114,9 @@ export const PartnershipRequestList = () => {
       {
         field: "status",
         headerName: t("partnership_requests.fields.status", "Status"),
-        width: 140,
+        width: 150,
+        align: "center",
+        headerAlign: "center",
         renderCell: ({ value }) => {
           let color: "info" | "success" | "error" | "default" = "default";
           if (value === "NEW") color = "info";
@@ -97,15 +129,13 @@ export const PartnershipRequestList = () => {
           );
 
           return (
-            <CenteredCell>
-              <Chip
-                label={translatedStatus}
-                color={color}
-                size="small"
-                variant={value === "NEW" ? "filled" : "outlined"}
-                sx={{ fontWeight: "bold" }}
-              />
-            </CenteredCell>
+            <Chip
+              label={translatedStatus}
+              color={color}
+              size="small"
+              variant={value === "NEW" ? "filled" : "outlined"}
+              sx={{ fontWeight: "bold" }}
+            />
           );
         },
       },
@@ -113,34 +143,27 @@ export const PartnershipRequestList = () => {
         field: "created_at",
         headerName: t("partnership_requests.fields.created_at", "Created"),
         width: 160,
+        align: "center",
+        headerAlign: "center",
         renderCell: ({ value }) => (
-          <CenteredCell>
+          <Typography variant="body2" color="text.secondary">
             <DateField value={value} format="DD.MM.YYYY HH:mm" />
-          </CenteredCell>
+          </Typography>
         ),
       },
       {
         field: "actions",
         headerName: t("table.actions", "Actions"),
         sortable: false,
-        width: 120,
+        width: 100,
+        align: "center",
+        headerAlign: "center",
         renderCell: ({ row }) => (
-          <CenteredCell spacing={1}>
-            <ShowButton size="small" hideText recordItemId={row.id} />
-          </CenteredCell>
+          <ShowButton size="small" hideText recordItemId={row.id} />
         ),
       },
     ];
-
-    if (isMobile) {
-      return baseColumns.filter(
-        (c) =>
-          c.field !== "id" && c.field !== "created_at" && c.field !== "owner",
-      );
-    }
-
-    return baseColumns;
-  }, [t, isMobile]);
+  }, [t]);
 
   return (
     <List title={t("partnership_requests.list.title", "Partnership Requests")}>
@@ -151,17 +174,25 @@ export const PartnershipRequestList = () => {
         density="comfortable"
         pageSizeOptions={[10, 25, 50, 100]}
         slots={{ noRowsOverlay: CustomNoRowsOverlay }}
+        getRowHeight={() => "auto"}
+        columnVisibilityModel={{
+          owner: !isMobile,
+          created_at: !isMobile,
+        }}
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {
+            display: "flex",
+            alignItems: "center",
+            py: 1,
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "background.paper",
             borderBottom: "1px solid",
             borderColor: "divider",
-            whiteSpace: "normal",
-            lineHeight: "1.3em",
-            py: 1,
-            alignItems: "center",
-            display: "flex",
-            flexDirection: "row",
+          },
+          "& .MuiDataGrid-row:hover": {
+            backgroundColor: "action.hover",
           },
         }}
         disableRowSelectionOnClick
