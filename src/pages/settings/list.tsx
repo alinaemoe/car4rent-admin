@@ -3,7 +3,6 @@ import { List, EditButton, DeleteButton } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Typography,
-  Box,
   Stack,
   Chip,
   TextField,
@@ -16,9 +15,6 @@ import TextFieldsIcon from "@mui/icons-material/TextFields";
 import { useTranslate, useList } from "@refinedev/core";
 import { CenteredCell } from "../../components/common/centered-cell";
 import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
-import { useFormLanguage } from "../../contexts/form-language";
-import { FormLanguageProvider } from "../../contexts/form-language";
-import { LanguageTabs } from "../../components/form/language-tabs";
 
 interface SettingRow {
   id: string;
@@ -27,27 +23,38 @@ interface SettingRow {
   description: string | null;
 }
 
-function detectValueType(value: string): { type: "string" | "object" | "array"; preview: string } {
+function detectValueType(value: string): {
+  type: "string" | "object" | "array";
+  preview: string;
+} {
   if (!value) return { type: "string", preview: "" };
   try {
     const parsed = JSON.parse(value);
     if (Array.isArray(parsed)) {
       const preview = JSON.stringify(parsed.slice(0, 3));
-      return { type: "array", preview: preview.length > 80 ? preview.slice(0, 80) + "..." : preview };
+      return {
+        type: "array",
+        preview: preview.length > 80 ? preview.slice(0, 80) + "..." : preview,
+      };
     }
     if (typeof parsed === "object" && parsed !== null) {
       const preview = JSON.stringify(parsed);
-      return { type: "object", preview: preview.length > 80 ? preview.slice(0, 80) + "..." : preview };
+      return {
+        type: "object",
+        preview: preview.length > 80 ? preview.slice(0, 80) + "..." : preview,
+      };
     }
     return { type: "string", preview: value };
   } catch {
-    return { type: "string", preview: value.length > 100 ? value.slice(0, 100) + "..." : value };
+    return {
+      type: "string",
+      preview: value.length > 100 ? value.slice(0, 100) + "..." : value,
+    };
   }
 }
 
 const SettingListInner = () => {
   const t = useTranslate();
-  const { activeLang } = useFormLanguage();
   const [searchQuery, setSearchQuery] = useState("");
 
   const { result, isLoading } = useList<SettingRow>({
@@ -124,7 +131,13 @@ const SettingListInner = () => {
                 <Chip
                   label={type}
                   size="small"
-                  color={type === "object" ? "warning" : type === "array" ? "success" : "info"}
+                  color={
+                    type === "object"
+                      ? "warning"
+                      : type === "array"
+                      ? "success"
+                      : "info"
+                  }
                   variant="outlined"
                   sx={{ height: 20, fontSize: 11, flexShrink: 0 }}
                 />
@@ -156,7 +169,12 @@ const SettingListInner = () => {
         flex: 0.7,
         renderCell: ({ value }) => (
           <Stack justifyContent="center" sx={{ height: "100%" }}>
-            <Typography variant="body2" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              noWrap
+              sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+            >
               {value || "—"}
             </Typography>
           </Stack>
@@ -176,7 +194,10 @@ const SettingListInner = () => {
               size="small"
               hideText
               recordItemId={row.id}
-              confirmTitle={t("settings.messages.deleteConfirm", "Delete this setting?")}
+              confirmTitle={t(
+                "settings.messages.deleteConfirm",
+                "Delete this setting?",
+              )}
               confirmOkText={t("buttons.delete", "Delete")}
               confirmCancelText={t("buttons.cancel", "Cancel")}
             />
@@ -184,7 +205,7 @@ const SettingListInner = () => {
         ),
       },
     ],
-    [t, activeLang],
+    [t],
   );
 
   return (
@@ -198,7 +219,10 @@ const SettingListInner = () => {
       >
         <TextField
           size="small"
-          placeholder={t("search.placeholder", "Search key, value or description...")}
+          placeholder={t(
+            "search.placeholder",
+            "Search key, value or description...",
+          )}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           InputProps={{
@@ -235,10 +259,4 @@ const SettingListInner = () => {
   );
 };
 
-export const SettingList = () => {
-  return (
-    <FormLanguageProvider>
-      <SettingListInner />
-    </FormLanguageProvider>
-  );
-};
+export const SettingList = SettingListInner;

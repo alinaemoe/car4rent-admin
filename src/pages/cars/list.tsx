@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   useDataGrid,
   List,
@@ -15,34 +15,70 @@ import {
   Box,
   useMediaQuery,
   Theme,
+  TextField,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import { useTranslate } from "@refinedev/core";
 
 import { CenteredCell } from "../../components/common/centered-cell";
 import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
+
+const STATUS_OPTIONS = ["", "AVAILABLE", "RENTED", "MAINTENANCE"];
 
 export const CarList = () => {
   const t = useTranslate();
   const isMobile = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down("md"),
   );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   const { dataGridProps } = useDataGrid({
     syncWithLocation: true,
   });
 
-  const columns = useMemo<GridColDef[]>(() => {
-    const baseColumns: GridColDef[] = [
+  const rows = useMemo(() => {
+    const data = (dataGridProps.rows as any[]) || [];
+    let filtered = data;
+
+    if (searchQuery) {
+      const lower = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (row) =>
+          (row.brand || "").toLowerCase().includes(lower) ||
+          (row.model || "").toLowerCase().includes(lower) ||
+          (row.license_plate || "").toLowerCase().includes(lower),
+      );
+    }
+
+    if (statusFilter) {
+      filtered = filtered.filter((row) => row.status === statusFilter);
+    }
+
+    return filtered;
+  }, [dataGridProps.rows, searchQuery, statusFilter]);
+
+  const columns = useMemo<GridColDef[]>(
+    () => [
       {
         field: "id",
         headerName: t("table.id", "ID"),
-        width: 70,
+        minWidth: 60,
+        flex: 0.3,
+        align: "center",
+        headerAlign: "center",
         renderCell: ({ value }) => <CenteredCell>#{value}</CenteredCell>,
       },
       {
         field: "brand",
         headerName: t("cars.fields.car", "Car"),
-        width: 300,
+        minWidth: 280,
+        flex: 1,
         renderCell: ({ row }) => {
           const image = row.images?.[0]?.url;
           return (
@@ -55,15 +91,15 @@ export const CarList = () => {
               <Avatar
                 src={image}
                 variant="rounded"
-                sx={{ width: 60, height: 40 }}
+                sx={{ width: 60, height: 40, flexShrink: 0 }}
               >
                 🚗
               </Avatar>
               <Box>
-                <Typography variant="body2" fontWeight="bold" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 220 }}>
+                <Typography variant="body2" fontWeight="bold">
                   {row.brand} {row.model}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" noWrap sx={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 220 }}>
+                <Typography variant="caption" color="text.secondary">
                   {row.year} • {row.license_plate}
                 </Typography>
               </Box>
@@ -74,7 +110,9 @@ export const CarList = () => {
       {
         field: "price_per_day",
         headerName: t("cars.fields.price", "Price / Day"),
-        width: 120,
+        minWidth: 110,
+        align: "center",
+        headerAlign: "center",
         renderCell: ({ value }) => (
           <CenteredCell>
             <Typography fontWeight="bold">${value}</Typography>
@@ -82,12 +120,42 @@ export const CarList = () => {
         ),
       },
       {
+        field: "owner",
+        headerName: t("cars.fields.owner.label", "Owner"),
+        minWidth: 180,
+        flex: 0.5,
+        renderCell: ({ row }) => {
+          const owner = row.owner;
+          if (!owner) {
+            return (
+              <CenteredCell>
+                <Typography variant="caption" color="text.disabled">
+                  —
+                </Typography>
+              </CenteredCell>
+            );
+          }
+          const name =
+            `${owner.first_name || ""} ${owner.last_name || ""}`.trim() ||
+            owner.email;
+          return (
+            <Stack justifyContent="center" height="100%">
+              <Typography variant="body2">{name}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {owner.email}
+              </Typography>
+            </Stack>
+          );
+        },
+      },
+      {
         field: "status",
         headerName: t("cars.fields.status", "Status"),
-        width: 140,
+        minWidth: 130,
+        align: "center",
+        headerAlign: "center",
         renderCell: ({ value }) => {
           let color: "success" | "warning" | "error" | "default" = "default";
-
           if (value === "AVAILABLE") color = "success";
           if (value === "RENTED") color = "warning";
           if (value === "MAINTENANCE") color = "error";
@@ -108,9 +176,11 @@ export const CarList = () => {
         field: "actions",
         headerName: t("table.actions", "Actions"),
         sortable: false,
-        width: 150,
+        minWidth: 140,
+        align: "center",
+        headerAlign: "center",
         renderCell: ({ row }) => (
-          <CenteredCell spacing={1}>
+          <CenteredCell spacing={0.5}>
             <EditButton size="small" hideText recordItemId={row.id} />
             <ShowButton size="small" hideText recordItemId={row.id} />
             {row.status === "AVAILABLE" && (
@@ -119,35 +189,81 @@ export const CarList = () => {
           </CenteredCell>
         ),
       },
-    ];
-
-    return baseColumns;
-  }, [t]);
+    ],
+    [t],
+  );
 
   return (
     <List>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "stretch", sm: "center" }}
+        spacing={2}
+        mb={3}
+      >
+        <TextField
+          size="small"
+          placeholder={t(
+            "search.placeholder",
+            "Search brand, model or plate...",
+          )}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+          sx={{ minWidth: 250 }}
+        />
+        <FormControl size="small" sx={{ minWidth: 160 }}>
+          <InputLabel id="status-filter-label">
+            {t("cars.fields.status", "Status")}
+          </InputLabel>
+          <Select
+            labelId="status-filter-label"
+            label={t("cars.fields.status", "Status")}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <MenuItem value="">
+              <em>{t("common.all", "All")}</em>
+            </MenuItem>
+            {STATUS_OPTIONS.filter(Boolean).map((s) => (
+              <MenuItem key={s} value={s}>
+                {t(`cars.enums.status.${s}`, s)}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Stack>
+
       <DataGrid
         {...dataGridProps}
+        rows={rows}
         columns={columns}
         autoHeight
         density="comfortable"
+        rowHeight={70}
         pageSizeOptions={[10, 25, 50, 100]}
         slots={{ noRowsOverlay: CustomNoRowsOverlay }}
         columnVisibilityModel={{
           id: !isMobile,
           price_per_day: !isMobile,
+          owner: !isMobile,
         }}
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {
             borderBottom: "1px solid",
             borderColor: "divider",
-            whiteSpace: "normal",
+            whiteSpace: "normal", // Включаем перенос текста
             lineHeight: "1.3em",
-            py: 1,
             alignItems: "center",
             display: "flex",
-            flexDirection: "row",
           },
         }}
         disableRowSelectionOnClick

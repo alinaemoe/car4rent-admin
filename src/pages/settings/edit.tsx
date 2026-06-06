@@ -6,20 +6,22 @@ import {
   Typography,
   Stack,
   Paper,
-  Button,
   Chip,
-  IconButton,
-  Tooltip,
+  Button,
 } from "@mui/material";
 import { useForm } from "@refinedev/react-hook-form";
 import { useTranslate } from "@refinedev/core";
-import { FormProvider } from "react-hook-form";
+import { FormProvider, useFormContext } from "react-hook-form";
 import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft";
 import DataObjectIcon from "@mui/icons-material/DataObject";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 
-function tryFormatJson(value: string): { formatted: string; valid: boolean; type: "string" | "object" | "array" | null } {
+function tryFormatJson(value: string): {
+  formatted: string;
+  valid: boolean;
+  type: "string" | "object" | "array" | null;
+} {
   if (!value || !value.trim()) {
     return { formatted: value, valid: true, type: null };
   }
@@ -36,18 +38,14 @@ function tryFormatJson(value: string): { formatted: string; valid: boolean; type
 
 const SmartValueField = () => {
   const t = useTranslate();
-  const { register, watch, setValue } = useForm() as any;
+  const { register, watch, setValue } = useFormContext();
 
   const value: string = watch("value") ?? "";
   const { formatted, valid, type } = tryFormatJson(value);
   const [useFormatted, setUseFormatted] = useState(false);
 
   useEffect(() => {
-    if (valid && type && formatted !== value) {
-      setUseFormatted(true);
-    } else {
-      setUseFormatted(false);
-    }
+    setUseFormatted(!!(valid && type && formatted === value));
   }, [valid, type, formatted, value]);
 
   const handleFormat = useCallback(() => {
@@ -66,7 +64,10 @@ const SmartValueField = () => {
           label={t("settings.fields.value", "Value")}
           variant="outlined"
           InputLabelProps={{ shrink: true }}
-          placeholder={t("settings.placeholders.value", "Setting value (plain text or JSON)")}
+          placeholder={t(
+            "settings.placeholders.value",
+            "Setting value (plain text or JSON)",
+          )}
           multiline
           minRows={4}
           maxRows={20}
@@ -78,11 +79,23 @@ const SmartValueField = () => {
           }}
         />
       </Stack>
-      <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={1}
+        flexWrap="wrap"
+        useFlexGap
+      >
         {type && (
           <Chip
-            icon={type === "object" ? <DataObjectIcon /> : <FormatAlignLeftIcon />}
-            label={type === "object" ? t("settings.messages.jsonMode", "JSON") : t("settings.messages.textMode", "Text")}
+            icon={
+              type === "object" ? <DataObjectIcon /> : <FormatAlignLeftIcon />
+            }
+            label={
+              type === "object"
+                ? t("settings.messages.jsonMode", "JSON")
+                : t("settings.messages.textMode", "Text")
+            }
             size="small"
             color={type === "object" || type === "array" ? "warning" : "info"}
             variant="outlined"
@@ -110,10 +123,13 @@ const SmartValueField = () => {
           <Button
             size="small"
             variant="outlined"
+            disabled={useFormatted}
             startIcon={<FormatAlignLeftIcon />}
             onClick={handleFormat}
           >
-            {t("settings.messages.jsonFormat", "Format JSON")}
+            {useFormatted
+              ? t("settings.messages.jsonFormatted", "Already formatted")
+              : t("settings.messages.jsonFormat", "Format JSON")}
           </Button>
         )}
       </Stack>
@@ -161,7 +177,10 @@ export const SettingEdit = () => {
                 label={t("settings.fields.key", "Key")}
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
-                placeholder={t("settings.placeholders.key", "e.g. support_phone, currency")}
+                placeholder={t(
+                  "settings.placeholders.key",
+                  "e.g. support_phone, currency",
+                )}
                 error={!!errors.key}
                 helperText={errors.key?.message as string}
                 InputProps={{
@@ -182,7 +201,10 @@ export const SettingEdit = () => {
                 label={t("settings.fields.description", "Description")}
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
-                placeholder={t("settings.placeholders.description", "What this setting controls")}
+                placeholder={t(
+                  "settings.placeholders.description",
+                  "What this setting controls",
+                )}
                 multiline
                 minRows={2}
                 maxRows={4}

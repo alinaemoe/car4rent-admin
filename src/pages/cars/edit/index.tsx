@@ -153,9 +153,16 @@ export const CarEdit: React.FC = () => {
     refineCore: { query },
     handleSubmit,
     refineCore,
+    reset,
   } = methods;
 
   const carData = query?.data?.data;
+
+  useEffect(() => {
+    if (carData) {
+      reset(carData);
+    }
+  }, [carData, reset]);
 
   // Перехватчик сохранения (чистим объекты перед отправкой патча)
   const onFinishHandler = async (data: FieldValues) => {

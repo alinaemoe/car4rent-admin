@@ -72,9 +72,13 @@ i18n
           "partnership-requests": { "partnership-requests": "Partner Requests" },
           "rental-leads": { "rental-leads": "Rental Leads" },
           common: {
+            all: "All",
             confirm: {
               delete: "Are you sure?",
             },
+          },
+          search: {
+            placeholder: "Search brand, model or plate...",
           },
           locations: {
             locations: "Locations",
@@ -813,9 +817,13 @@ i18n
           "partnership-requests": { "partnership-requests": "Заявки партнёров" },
           "rental-leads": { "rental-leads": "Заявки на аренду" },
           common: {
+            all: "Все",
             confirm: {
               delete: "Вы уверены?",
             },
+          },
+          search: {
+            placeholder: "Поиск по марке, модели или номеру...",
           },
           locations: {
             locations: "Локации",
