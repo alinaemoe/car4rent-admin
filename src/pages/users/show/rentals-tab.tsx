@@ -29,7 +29,7 @@ export const RentalsTab = ({ userId }: RentalsTabProps) => {
     resource: "rentals",
     filters: [
       {
-        field: "user.id",
+        field: "userId",
         operator: "eq",
         value: userId,
       },

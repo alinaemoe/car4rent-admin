@@ -30,7 +30,7 @@ export const CarRentalsTab = ({ carId }: CarRentalsTabProps) => {
     resource: "rentals",
     filters: [
       {
-        field: "car.id", // 👈 ФИЛЬТРУЕМ ПО МАШИНЕ
+        field: "carId",
         operator: "eq",
         value: carId,
       },
