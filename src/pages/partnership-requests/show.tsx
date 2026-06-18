@@ -17,9 +17,11 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { DateField } from "@refinedev/mui";
+import { useNavigate } from "react-router-dom";
 
 export const PartnershipRequestShow = () => {
-  const t = useTranslate(); // 👈 Добавили хук перевода
+  const t = useTranslate();
+  const navigate = useNavigate();
   const { query } = useShow() as any;
   const { mutate, isLoading: isUpdating } = useUpdate() as any;
 
@@ -39,16 +41,14 @@ export const PartnershipRequestShow = () => {
   };
 
   const handleCreateCar = () => {
-    const brand = encodeURIComponent(record.car_brand);
-    const model = encodeURIComponent(record.car_model);
-    const year = record.car_year;
-    const ownerId = record.user?.id || "";
-    // Собираем картинки в строку через запятую
-    const photos = record.photos
-      ? encodeURIComponent(record.photos.join(","))
-      : "";
-
-    window.location.href = `/cars/create?brand=${brand}&model=${model}&year=${year}&owner_id=${ownerId}&photos=${photos}`;
+    const params = new URLSearchParams({
+      brand: record.car_brand || "",
+      model: record.car_model || "",
+      year: String(record.car_year || ""),
+      owner_id: record.user?.id || "",
+      photos: record.photos ? record.photos.join(",") : "",
+    });
+    navigate(`/cars/create?${params.toString()}`);
   };
 
   const translatedStatus = t(
