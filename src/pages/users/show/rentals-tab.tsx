@@ -83,7 +83,7 @@ export const RentalsTab = ({ userId }: RentalsTabProps) => {
                   {car ? `${car.brand} ${car.model}` : "—"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {car ? `${car.year} • ${car.number_plate}` : "—"}
+                  {car ? `${car.year} • ${car.license_plate}` : "—"}
                 </Typography>
               </Box>
             </Stack>
@@ -144,7 +144,7 @@ export const RentalsTab = ({ userId }: RentalsTabProps) => {
         align: "right",
         headerAlign: "right",
         renderCell: ({ row }) => {
-          const price = row.total_price || row.base_price;
+          const price = Number(row.total_price || row.base_price || 0);
           return (
             <Stack
               justifyContent="center"
@@ -152,7 +152,7 @@ export const RentalsTab = ({ userId }: RentalsTabProps) => {
               width="100%"
               alignItems="flex-end"
             >
-              <Typography fontWeight="bold">${price}</Typography>
+              <Typography fontWeight="bold">${price.toLocaleString()}</Typography>
               {row.penalty_price > 0 && (
                 <Typography variant="caption" color="error">
                   + ${row.penalty_price} fine
@@ -226,7 +226,7 @@ export const RentalsTab = ({ userId }: RentalsTabProps) => {
   if (rows.length === 0) {
     return (
       <Box textAlign="center" py={5} color="text.secondary">
-        <Typography>Нет активных или прошлых аренд</Typography>
+        <Typography>{t("rentals.messages.no_rentals", "No rentals found")}</Typography>
       </Box>
     );
   }

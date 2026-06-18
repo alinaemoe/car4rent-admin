@@ -185,8 +185,8 @@ export const RentalList = () => {
         headerAlign: "right",
         renderCell: ({ row }) => {
           // Если аренда завершена, показываем total, иначе base
-          const price = row.total_price || row.base_price || 0;
-          const hasPenalty = row.penalty_price > 0;
+          const price = Number(row.total_price || row.base_price || 0);
+          const hasPenalty = Number(row.penalty_price) > 0;
 
           return (
             <Stack
@@ -195,10 +195,10 @@ export const RentalList = () => {
               height="100%"
               width="100%"
             >
-              <Typography fontWeight="bold">${price}</Typography>
+              <Typography fontWeight="bold">${price.toLocaleString()}</Typography>
               {hasPenalty && (
                 <Typography variant="caption" color="error">
-                  +${row.penalty_price} fine
+                  +${Number(row.penalty_price).toLocaleString()} fine
                 </Typography>
               )}
             </Stack>
