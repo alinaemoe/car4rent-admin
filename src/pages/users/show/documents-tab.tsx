@@ -119,7 +119,7 @@ export const DocumentsTab = ({ userId }: DocumentsTabProps) => {
   if (documents.length === 0) {
     return (
       <Box sx={{ textAlign: "center", py: 5, color: "text.secondary" }}>
-        <Typography variant="h6">Нет загруженных документов</Typography>
+        <Typography variant="h6">{t("documents.messages.no_documents", "No documents uploaded")}</Typography>
       </Box>
     );
   }

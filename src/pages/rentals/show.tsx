@@ -88,7 +88,7 @@ export const RentalShow = () => {
               size="small"
             />
             <Chip
-              label={`${t("rentals.fields.price", "Price")}: $${record.total_price || record.base_price}`}
+              label={`${t("rentals.fields.price", "Price")}: $${Number(record.total_price || record.base_price || 0).toLocaleString()}`}
               variant="outlined"
               size="small"
             />
@@ -213,19 +213,19 @@ const DetailsTab = ({ record, t }: { record: any; t: any }) => {
           <Stack spacing={2}>
             <Stack direction="row" justifyContent="space-between">
               <Typography color="text.secondary">{t("rentals.details.basePrice", "Base Price")}</Typography>
-              <Typography>${record.base_price}</Typography>
+              <Typography>${Number(record.base_price || 0).toLocaleString()}</Typography>
             </Stack>
             <Divider />
             <Stack direction="row" justifyContent="space-between">
               <Typography color="text.secondary">{t("rentals.details.penalty", "Penalty")}</Typography>
-              <Typography color={record.penalty_price > 0 ? "error" : "text.primary"}>
-                ${record.penalty_price || 0}
+              <Typography color={Number(record.penalty_price) > 0 ? "error" : "text.primary"}>
+                ${Number(record.penalty_price || 0).toLocaleString()}
               </Typography>
             </Stack>
             <Divider />
             <Stack direction="row" justifyContent="space-between">
               <Typography fontWeight="bold">{t("rentals.details.total", "Total")}</Typography>
-              <Typography fontWeight="bold" color="primary">${record.total_price || record.base_price}</Typography>
+              <Typography fontWeight="bold" color="primary">${Number(record.total_price || record.base_price || 0).toLocaleString()}</Typography>
             </Stack>
           </Stack>
         </Paper>

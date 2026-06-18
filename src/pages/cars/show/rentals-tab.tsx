@@ -223,7 +223,7 @@ export const CarRentalsTab = ({ carId }: CarRentalsTabProps) => {
   if (rows.length === 0) {
     return (
       <Box textAlign="center" py={5} color="text.secondary">
-        <Typography>Нет активных или прошлых аренд</Typography>
+        <Typography>{t("rentals.messages.no_rentals", "No rentals found")}</Typography>
       </Box>
     );
   }
