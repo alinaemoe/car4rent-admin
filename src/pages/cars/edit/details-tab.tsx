@@ -31,6 +31,7 @@ import { FormLanguageProvider } from "../../../contexts/form-language";
 import { LanguageTabs } from "../../../components/form/language-tabs";
 import { LocalizedInput } from "../../../components/form/localized-input";
 import { Dictionaries } from "./index"; // Импортируем типизацию словарей
+import { DiscountTiersEditor } from "../components/DiscountTiersEditor";
 
 const STATUS_OPTIONS = [
   { value: "AVAILABLE", label: "Available" },
@@ -403,6 +404,9 @@ export const CarDetailsTab: React.FC<DetailsTabProps> = ({
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
+
+          <DiscountTiersEditor />
+
           <Grid item xs={12}>
             <TextField
               {...register("current_mileage", { valueAsNumber: true })}

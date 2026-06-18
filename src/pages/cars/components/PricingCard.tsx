@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { useFormContext } from "react-hook-form";
 import { useTranslate } from "@refinedev/core";
+import { DiscountTiersEditor } from "./DiscountTiersEditor";
 
 export const PricingCard = () => {
   const t = useTranslate();
@@ -105,6 +106,8 @@ export const PricingCard = () => {
             InputLabelProps={{ shrink: true }}
           />
         </Grid>
+
+        <DiscountTiersEditor />
       </Grid>
     </Paper>
   );
