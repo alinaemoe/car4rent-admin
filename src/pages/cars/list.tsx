@@ -28,7 +28,7 @@ import { useTranslate } from "@refinedev/core";
 import { CenteredCell } from "../../components/common/centered-cell";
 import { CustomNoRowsOverlay } from "../../components/common/custom-no-rows-overlay";
 
-const STATUS_OPTIONS = ["", "AVAILABLE", "RENTED", "MAINTENANCE"];
+const STATUS_OPTIONS = ["AVAILABLE", "RENTED", "MAINTENANCE"];
 
 export const CarList = () => {
   const t = useTranslate();
@@ -38,30 +38,26 @@ export const CarList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  const { dataGridProps } = useDataGrid({
+  const { dataGridProps, setFilters } = useDataGrid({
     syncWithLocation: true,
   });
 
-  const rows = useMemo(() => {
-    const data = (dataGridProps.rows as any[]) || [];
-    let filtered = data;
+  const buildFilters = (search: string, status: string) => {
+    const filters: { field: string; operator: string; value: string }[] = [];
+    if (search) filters.push({ field: "q", operator: "eq", value: search });
+    if (status) filters.push({ field: "status", operator: "eq", value: status });
+    return filters;
+  };
 
-    if (searchQuery) {
-      const lower = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (row) =>
-          (row.brand || "").toLowerCase().includes(lower) ||
-          (row.model || "").toLowerCase().includes(lower) ||
-          (row.license_plate || "").toLowerCase().includes(lower),
-      );
-    }
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setFilters(buildFilters(value, statusFilter) as any, "replace");
+  };
 
-    if (statusFilter) {
-      filtered = filtered.filter((row) => row.status === statusFilter);
-    }
-
-    return filtered;
-  }, [dataGridProps.rows, searchQuery, statusFilter]);
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    setFilters(buildFilters(searchQuery, value) as any, "replace");
+  };
 
   const columns = useMemo<GridColDef[]>(
     () => [
@@ -209,7 +205,7 @@ export const CarList = () => {
             "Search brand, model or plate...",
           )}
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -227,7 +223,7 @@ export const CarList = () => {
             labelId="status-filter-label"
             label={t("cars.fields.status", "Status")}
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => handleStatusChange(e.target.value)}
           >
             <MenuItem value="">
               <em>{t("common.all", "All")}</em>
@@ -243,7 +239,6 @@ export const CarList = () => {
 
       <DataGrid
         {...dataGridProps}
-        rows={rows}
         columns={columns}
         autoHeight
         density="comfortable"
