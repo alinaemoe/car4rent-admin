@@ -8,7 +8,7 @@ import {
   useInvalidate,
   useTranslate,
 } from "@refinedev/core";
-import { Box, Tabs, Tab, CircularProgress } from "@mui/material";
+import { Box, Tabs, Tab } from "@mui/material";
 import CarCrashIcon from "@mui/icons-material/CarCrash";
 import EditIcon from "@mui/icons-material/Edit";
 
@@ -219,18 +219,12 @@ export const CarEdit: React.FC = () => {
     }
   };
 
-  if (isLoadingDicts) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="50vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
+  // ВАЖНО: не блокируем рендер формы на время загрузки словарей.
+  // Если вернуть здесь <CircularProgress/>, то Controller-поля (Select/Autocomplete)
+  // не смонтированы в момент, когда Refine/наш reset заполняют форму, и значения
+  // в них не попадают — селекты остаются пустыми. Форма должна быть в DOM всегда;
+  // словари подгрузят опции чуть позже, а reset (см. выше, ждёт !isLoadingDicts)
+  // проставит значения уже по смонтированным полям с готовыми опциями.
 
   return (
     <FormProvider {...methods}>
