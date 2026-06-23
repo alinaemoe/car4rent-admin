@@ -73,12 +73,27 @@ export const BasicInfoCard = ({ colorsDict, reqOwnerId }: Props) => {
                   if (value?.id === null) field.onChange(null);
                   else field.onChange(value); // Записываем весь объект
                 }}
-                value={field.value || companyOption} // По умолчанию Company
+                // 🔧 Показываем ПОЛНЫЙ объект владельца, найденный по id среди
+                // загруженных опций (чтобы отображались имя/email партнёра из заявки).
+                // Если опции ещё грузятся — оставляем сам field.value; если владельца
+                // нет — "Company". Раньше тут всегда подставлялся companyOption, из-за
+                // чего партнёр из заявки не отображался и сбрасывался на компанию.
+                value={
+                  field.value?.id
+                    ? ownerOptions.find(
+                        (o: any) => o.id === field.value.id,
+                      ) || field.value
+                    : companyOption
+                }
                 getOptionLabel={(item: any) => {
+                  if (!item) return "";
                   if (item.id === null) return "🏢 Company (Our Fleet)";
-                  return item.first_name
-                    ? `${item.first_name} ${item.last_name} (${item.email})`
-                    : "";
+                  if (item.first_name)
+                    return `${item.first_name} ${item.last_name} (${item.email})`;
+                  return t(
+                    "cars.fields.owner.loading",
+                    "Владелец из заявки…",
+                  );
                 }}
                 isOptionEqualToValue={(option: any, value: any) => {
                   return option?.id === value?.id;

@@ -181,12 +181,14 @@ export const CarCreate: React.FC = () => {
   const onFinishHandler = async (data: FieldValues) => {
     const payload: Record<string, any> = { ...data };
 
-    // Форматируем данные владельца
-    if (data.owner?.id) {
-      payload.owner = { id: data.owner.id };
-    } else {
-      payload.owner = null; // Если выбрана "Компания"
-    }
+    // 🔧 Привязка владельца. Приоритет — явный выбор в форме (data.owner.id).
+    // Но если машина создаётся ИЗ ЗАЯВКИ ПАРТНЁРА (в URL пришёл owner_id),
+    // используем reqOwnerId как надёжный фолбэк — чтобы id владельца не терялся,
+    // даже если Autocomplete не успел подставить значение из загруженных опций.
+    // Именно из-за этой потери машина раньше создавалась с owner=null
+    // ("Our Fleet") вместо партнёра, и "Мой автопарк" в мобилке оставался пустым.
+    const ownerId = data.owner?.id ?? reqOwnerId ?? null;
+    payload.owner = ownerId ? { id: ownerId } : null;
 
     // Прикрепляем уже загруженные фото из заявки
     if (existingPhotos.length > 0) {
