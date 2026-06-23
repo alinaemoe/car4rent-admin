@@ -471,7 +471,9 @@ export const CarDetailsTab: React.FC<DetailsTabProps> = ({
                   {...field}
                   onChange={(_, value) => field.onChange(value)}
                   getOptionLabel={(item: any) =>
-                    item.name ? `${item.name} (${item.city || ""})` : ""
+                    item?.name
+                      ? `${item.name}${item.city ? ` (${item.city})` : ""}`
+                      : ""
                   }
                   isOptionEqualToValue={(option: any, value: any) =>
                     option?.id === value?.id
@@ -497,7 +499,13 @@ export const CarDetailsTab: React.FC<DetailsTabProps> = ({
                   {...field}
                   multiple
                   onChange={(_, value) => field.onChange(value)}
-                  getOptionLabel={(item: any) => item.name || ""}
+                  getOptionLabel={(item: any) =>
+                    item?.name ||
+                    item?.description?.ru ||
+                    item?.description?.en ||
+                    item?.internal_name ||
+                    ""
+                  }
                   isOptionEqualToValue={(option: any, value: any) =>
                     option?.id === value?.id
                   }
@@ -512,7 +520,13 @@ export const CarDetailsTab: React.FC<DetailsTabProps> = ({
                     value.map((option: any, index: number) => (
                       <Chip
                         variant="outlined"
-                        label={option.name}
+                        label={
+                          option?.name ||
+                          option?.description?.ru ||
+                          option?.description?.en ||
+                          option?.internal_name ||
+                          ""
+                        }
                         {...getTagProps({ index })}
                         key={option.id}
                       />

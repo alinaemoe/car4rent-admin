@@ -159,10 +159,17 @@ export const CarEdit: React.FC = () => {
   const carData = query?.data?.data;
 
   useEffect(() => {
-    if (carData) {
+    // Сбрасываем форму только когда готовы И данные машины, И словари
+    // дропдаунов. Раньше reset мог сработать до загрузки /settings, то есть
+    // до того, как отрисованы <Select> с опциями. В этот момент Controller-поля
+    // (статус, цвет, кузов, привод, топливо, владелец, локация, опции) не находят
+    // совпадающий MenuItem и остаются пустыми, хотя значение из carData пришло.
+    // register-поля (марка, VIN, цены) синкаются иначе и заполнялись корректно —
+    // отсюда и жалоба именно на дропдауны.
+    if (carData && !isLoadingDicts) {
       reset(carData);
     }
-  }, [carData, reset]);
+  }, [carData, isLoadingDicts, reset]);
 
   // Перехватчик сохранения (чистим объекты перед отправкой патча)
   const onFinishHandler = async (data: FieldValues) => {
