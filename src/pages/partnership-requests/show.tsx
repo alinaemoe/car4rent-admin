@@ -41,14 +41,15 @@ export const PartnershipRequestShow = () => {
   };
 
   const handleCreateCar = () => {
-    const params = new URLSearchParams({
-      brand: record.car_brand || "",
-      model: record.car_model || "",
-      year: String(record.car_year || ""),
-      owner_id: record.user?.id || "",
-      photos: record.photos ? record.photos.join(",") : "",
+    navigate("/cars/create", {
+      state: {
+        brand: record.car_brand || "",
+        model: record.car_model || "",
+        year: record.car_year || new Date().getFullYear(),
+        owner_id: record.user?.id ?? null,
+        photos: Array.isArray(record.photos) ? record.photos : [],
+      },
     });
-    navigate(`/cars/create?${params.toString()}`);
   };
 
   const translatedStatus = t(

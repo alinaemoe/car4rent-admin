@@ -4,7 +4,7 @@ import { Box, CircularProgress, Alert } from "@mui/material";
 import { useForm } from "@refinedev/react-hook-form";
 import { FormProvider, FieldValues } from "react-hook-form";
 import { useTranslate, useNavigation, useNotification } from "@refinedev/core";
-import { useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import { axiosInstance } from "../../utility/axios-instance";
 
@@ -34,20 +34,24 @@ export const CarCreate: React.FC = () => {
   const t = useTranslate();
   const { list } = useNavigation();
   const { open } = useNotification();
-  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const routeState = (location.state ?? {}) as {
+    brand?: string;
+    model?: string;
+    year?: number;
+    owner_id?: string | null;
+    photos?: string[];
+  };
 
-  // 1. Инициализация параметров из URL (переход из заявки)
-  const reqBrand = searchParams.get("brand") || "";
-  const reqModel = searchParams.get("model") || "";
-  const parsedYear = Number(searchParams.get("year"));
+  // 1. Инициализация параметров из router state (переход из заявки)
+  const reqBrand = routeState.brand || "";
+  const reqModel = routeState.model || "";
   const reqYear =
-    !isNaN(parsedYear) && parsedYear > 1900
-      ? parsedYear
+    routeState.year && routeState.year > 1900
+      ? routeState.year
       : new Date().getFullYear();
-  const reqOwnerId = searchParams.get("owner_id") || null;
-
-  const reqPhotosParam = searchParams.get("photos");
-  const reqPhotos = reqPhotosParam ? reqPhotosParam.split(",") : [];
+  const reqOwnerId = routeState.owner_id ?? null;
+  const reqPhotos = Array.isArray(routeState.photos) ? routeState.photos : [];
 
   // 2. Стейты
   const [existingPhotos, setExistingPhotos] = useState<string[]>(reqPhotos);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Grid,
   TextField,
@@ -32,8 +32,17 @@ export const BasicInfoCard = ({ colorsDict, reqOwnerId }: Props) => {
   const {
     register,
     control,
+    setValue,
     formState: { errors },
   } = useFormContext();
+
+  // Явно выставляем владельца через setValue — надёжнее, чем только defaultValues,
+  // т.к. Refine может сбросить форму после своей async-инициализации.
+  useEffect(() => {
+    if (reqOwnerId) {
+      setValue("owner", { id: reqOwnerId }, { shouldDirty: false });
+    }
+  }, [reqOwnerId, setValue]);
 
   // 👇 НАСТРАИВАЕМ AUTOCOMPLETE ДЛЯ ВЛАДЕЛЬЦЕВ
   const { autocompleteProps: ownerProps } = useAutocomplete({
