@@ -38,6 +38,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import FlagIcon from "@mui/icons-material/Flag";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { API_URL } from "../../utility/axios-instance";
+import { FinishRentalDialog, FinishPayload } from "./components/FinishRentalDialog";
 
 const STATUS_OPTIONS = [
   { value: "CREATED", labelKey: "rentals.enums.status.CREATED", defaultLabel: "Created" },
@@ -57,11 +58,7 @@ export const RentalEdit = () => {
   const { mutate: finishRental } = useCustomMutation();
 
   const [finishDialogOpen, setFinishDialogOpen] = useState(false);
-  const [finishData, setFinishData] = useState({
-    end_mileage: 0,
-    end_fuel: 100,
-    actual_return_date: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
-  });
+  const [isFinishing, setIsFinishing] = useState(false);
 
   const {
     saveButtonProps,
@@ -115,22 +112,25 @@ export const RentalEdit = () => {
     );
   };
 
-  const handleFinishRental = async () => {
+  const handleFinishRental = async (payload: FinishPayload) => {
     if (!record?.id) return;
+    setIsFinishing(true);
 
     finishRental(
       {
         url: `${API_URL}/rentals/${record.id}/finish`,
         method: "post",
-        values: finishData,
+        values: payload,
       },
       {
         onSuccess: () => {
           open?.({ type: "success", message: t("rentals.messages.rentalFinished", "Rental finished") });
           setFinishDialogOpen(false);
+          setIsFinishing(false);
           invalidate({ resource: "rentals", invalidates: ["list", "detail"] });
         },
         onError: (error: any) => {
+          setIsFinishing(false);
           open?.({
             type: "error",
             message: error?.response?.data?.message || t("rentals.messages.finishError", "Failed to finish rental"),
@@ -378,54 +378,14 @@ export const RentalEdit = () => {
           </Paper>
         </Box>
 
-        <Dialog open={finishDialogOpen} onClose={() => setFinishDialogOpen(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>
-            {t("rentals.edit.finishDialogTitle", "Finish Rental")}
-          </DialogTitle>
-          <DialogContent>
-            <Stack spacing={3} mt={2}>
-              <TextField
-                label={t("rentals.edit.endMileage", "End Mileage (km)")}
-                type="number"
-                fullWidth
-                value={finishData.end_mileage}
-                onChange={(e) => setFinishData({ ...finishData, end_mileage: Number(e.target.value) })}
-                InputProps={{
-                  startAdornment: <InputAdornment position="start">km</InputAdornment>,
-                }}
-              />
-              <TextField
-                label={t("rentals.edit.endFuel", "End Fuel (%)")}
-                type="number"
-                fullWidth
-                value={finishData.end_fuel}
-                onChange={(e) => setFinishData({ ...finishData, end_fuel: Number(e.target.value) })}
-                InputProps={{
-                  startAdornment: <InputAdornment position="start">%</InputAdornment>,
-                }}
-                inputProps={{ min: 0, max: 100 }}
-              />
-              <DateTimePicker
-                label={t("rentals.edit.actualReturnDate", "Actual Return Date")}
-                value={dayjs(finishData.actual_return_date)}
-                onChange={(newValue) => {
-                  if (newValue) setFinishData({ ...finishData, actual_return_date: newValue.toISOString() });
-                }}
-                slotProps={{
-                  textField: { fullWidth: true, margin: "normal" },
-                }}
-              />
-            </Stack>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setFinishDialogOpen(false)} color="inherit">
-              {t("buttons.cancel", "Cancel")}
-            </Button>
-            <Button onClick={handleFinishRental} variant="contained" color="success">
-              {t("rentals.edit.confirmFinish", "Confirm Finish")}
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <FinishRentalDialog
+          open={finishDialogOpen}
+          onClose={() => setFinishDialogOpen(false)}
+          carImageUrl={record?.car?.images?.[0]?.url}
+          basePrice={Number(record?.base_price) || 0}
+          onConfirm={handleFinishRental}
+          isSubmitting={isFinishing}
+        />
       </Edit>
     </LocalizationProvider>
   );
