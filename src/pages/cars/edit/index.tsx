@@ -206,11 +206,37 @@ export const CarEdit: React.FC = () => {
   const onFinishHandler = async (data: FieldValues) => {
     const payload: Record<string, any> = { ...data };
 
+    // Убираем read-only / серверные поля, которых нет в UpdateCarDto.
+    // reset(carData) кладёт в форму ВЕСЬ объект машины (id, avg_rating,
+    // reviews_count, horsepower, fuel_consumption, images, created_at,
+    // updated_at, reviews, rentals...), а ValidationPipe с forbidNonWhitelisted
+    // отклоняет их → PATCH /cars/:id падал с 400. Шлём только редактируемое.
+    const READONLY_FIELDS = [
+      "id",
+      "avg_rating",
+      "reviews_count",
+      "horsepower",
+      "fuel_consumption",
+      "images",
+      "reviews",
+      "rentals",
+      "created_at",
+      "updated_at",
+    ];
+    READONLY_FIELDS.forEach((f) => delete payload[f]);
+
     if (data.owner?.id) payload.owner = { id: data.owner.id };
     else payload.owner = null;
 
     if (data.location?.id) payload.location = { id: data.location.id };
     else payload.location = null;
+
+    // features → массив { id }, как ждёт бэк
+    if (Array.isArray(data.features)) {
+      payload.features = data.features
+        .filter((f: any) => f?.id != null)
+        .map((f: any) => ({ id: f.id }));
+    }
 
     await refineCore.onFinish(payload);
   };
