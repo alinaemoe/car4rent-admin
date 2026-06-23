@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   useDataGrid,
   List,
@@ -17,7 +17,14 @@ import {
   Theme,
   Typography,
   Tooltip,
+  TextField,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useTranslate } from "@refinedev/core";
@@ -35,15 +42,45 @@ interface UserRow {
   created_at: string;
 }
 
+const ROLE_OPTIONS = ["CLIENT", "LESSOR", "MANAGER", "ADMIN"];
+const STATUS_OPTIONS = ["ACTIVE", "BANNED", "PENDING_VERIFICATION"];
+
 export const UserList = () => {
   const t = useTranslate();
-  const { dataGridProps } = useDataGrid({
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const { dataGridProps, setFilters } = useDataGrid({
     syncWithLocation: true,
   });
 
   const isMobile = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down("md"),
   );
+
+  const buildFilters = (search: string, role: string, status: string) => {
+    const filters: { field: string; operator: string; value: string }[] = [];
+    if (search) filters.push({ field: "q", operator: "eq", value: search });
+    if (role) filters.push({ field: "role", operator: "eq", value: role });
+    if (status) filters.push({ field: "status", operator: "eq", value: status });
+    return filters;
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setFilters(buildFilters(value, roleFilter, statusFilter) as any, "replace");
+  };
+
+  const handleRoleChange = (value: string) => {
+    setRoleFilter(value);
+    setFilters(buildFilters(searchQuery, value, statusFilter) as any, "replace");
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    setFilters(buildFilters(searchQuery, roleFilter, value) as any, "replace");
+  };
 
   const columns = useMemo<GridColDef<UserRow>[]>(
     () => [
@@ -119,7 +156,7 @@ export const UserList = () => {
               gap: 0.5,
               justifyContent: "center",
               alignItems: "center",
-              py: 1, // Отступы сверху/снизу для многострочных бейджей
+              py: 1,
             }}
           >
             {value?.length ? (
@@ -264,6 +301,107 @@ export const UserList = () => {
 
   return (
     <List>
+      {/* ПАНЕЛЬ ПОИСКА И ФИЛЬТРОВ */}
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "stretch", sm: "center" }}
+        spacing={2}
+        mb={3}
+      >
+        <TextField
+          size="small"
+          placeholder={t(
+            "users.search.placeholder",
+            "Search by name or email...",
+          )}
+          value={searchQuery}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+          sx={{ minWidth: 260 }}
+        />
+
+        <Stack direction="row" spacing={1.5} flexWrap="wrap">
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel id="role-filter-label">
+              {t("users.fields.roles", "Role")}
+            </InputLabel>
+            <Select
+              labelId="role-filter-label"
+              label={t("users.fields.roles", "Role")}
+              value={roleFilter}
+              onChange={(e) => handleRoleChange(e.target.value)}
+            >
+              <MenuItem value="">
+                <em>{t("common.all", "All")}</em>
+              </MenuItem>
+              {ROLE_OPTIONS.map((r) => (
+                <MenuItem key={r} value={r}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Chip
+                      label={t(`users.enums.roles.${r}`, r)}
+                      size="small"
+                      color={
+                        r === "ADMIN"
+                          ? "error"
+                          : r === "MANAGER"
+                          ? "warning"
+                          : r === "LESSOR"
+                          ? "info"
+                          : "default"
+                      }
+                      variant="filled"
+                      sx={{ fontWeight: 600, fontSize: "0.7rem", pointerEvents: "none" }}
+                    />
+                  </Stack>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel id="status-filter-label">
+              {t("users.fields.status", "Status")}
+            </InputLabel>
+            <Select
+              labelId="status-filter-label"
+              label={t("users.fields.status", "Status")}
+              value={statusFilter}
+              onChange={(e) => handleStatusChange(e.target.value)}
+            >
+              <MenuItem value="">
+                <em>{t("common.all", "All")}</em>
+              </MenuItem>
+              {STATUS_OPTIONS.map((s) => (
+                <MenuItem key={s} value={s}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Chip
+                      label={t(`users.enums.status.${s}`, s)}
+                      size="small"
+                      color={
+                        s === "ACTIVE"
+                          ? "success"
+                          : s === "BANNED"
+                          ? "error"
+                          : "warning"
+                      }
+                      variant="outlined"
+                      sx={{ fontWeight: 600, fontSize: "0.7rem", pointerEvents: "none" }}
+                    />
+                  </Stack>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
+      </Stack>
+
       <DataGrid
         {...dataGridProps}
         columns={columns}
@@ -271,7 +409,7 @@ export const UserList = () => {
         density="comfortable"
         pageSizeOptions={[10, 25, 50, 100]}
         slots={{ noRowsOverlay: CustomNoRowsOverlay }}
-        getRowHeight={() => "auto"} // Позволяет строкам растягиваться по контенту (для ролей)
+        getRowHeight={() => "auto"}
         columnVisibilityModel={{
           created_at: !isMobile,
           is_email_verified: !isMobile,
@@ -280,9 +418,9 @@ export const UserList = () => {
         sx={{
           border: "none",
           "& .MuiDataGrid-cell": {
-            display: "flex", // Включаем флексбокс для ячеек
-            alignItems: "center", // Идеальное выравнивание по вертикали
-            py: 1, // Базовый отступ сверху/снизу
+            display: "flex",
+            alignItems: "center",
+            py: 1,
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "background.paper",
