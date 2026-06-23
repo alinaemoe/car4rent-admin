@@ -110,6 +110,37 @@ export const CarEdit: React.FC = () => {
 
   // Настройка формы
   const methods = useForm<FieldValues, any, FieldValues>({
+    // ВАЖНО: задаём defaultValues для всех Controller-полей. Без них Select/
+    // Autocomplete стартуют с value=undefined (uncontrolled), и MUI не
+    // подхватывает значение, проставленное через reset/авто-populate Refine —
+    // дропдауны остаются пустыми. Так работает рабочая форма users edit и
+    // форма создания машины; у edit-машины этого не было — отсюда баг.
+    defaultValues: {
+      brand: "",
+      model: "",
+      year: new Date().getFullYear(),
+      license_plate: "",
+      vin: "",
+      color: "",
+      status: "AVAILABLE",
+      body_type: "",
+      drive_type: "",
+      transmission: "",
+      fuel_type: "",
+      price_per_day: 0,
+      deposit_amount: 0,
+      insurance_type: "",
+      mileage_limit_per_day: 0,
+      price_per_km_over_limit: 0,
+      min_age: 21,
+      min_experience: 2,
+      current_mileage: 0,
+      discount_tiers: {},
+      description: {},
+      owner: null,
+      location: null,
+      features: [],
+    },
     refineCoreProps: {
       redirect: false,
       onMutationSuccess: async (response) => {
