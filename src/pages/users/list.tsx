@@ -313,7 +313,7 @@ export const UserList = () => {
           size="small"
           placeholder={t(
             "users.search.placeholder",
-            "Search by name or email...",
+            "Поиск по имени или email...",
           )}
           value={searchQuery}
           onChange={(e) => handleSearchChange(e.target.value)}
